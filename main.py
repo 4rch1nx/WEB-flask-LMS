@@ -13,6 +13,10 @@ def home():
 def error():
     return render_template("error.html")
 
+@app.route("/sensors")
+def home():
+    return render_template("error.html", 501)
+
 @app.route("/toggle_led")
 def toggle_led():
     try:
