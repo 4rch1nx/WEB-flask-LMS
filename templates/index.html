@@ -3,24 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Latest News</title>
-    <style>
-        body { font-family: Arial, sans-serif; }
-        .news-container { width: 60%; margin: auto; }
-        .article { border-bottom: 1px solid #ccc; padding: 10px; }
-        h2 { color: #007bff; }
-    </style>
+    <title>ESP8266 LED Control</title>
+    <script>
+        function toggleLED() {
+            fetch("/toggle_led")
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById("status").innerText = "LED is " + data;
+                })
+                .catch(error => console.error("Error:", error));
+        }
+    </script>
 </head>
 <body>
-    <div class="news-container">
-        <h1>Последние новости</h1>
-        {% for article in articles %}
-            <div class="article">
-                <h2><a href="{{ article.url }}" target="_blank">{{ article.title }}</a></h2>
-                <p>{{ article.description }}</p>
-                <small>Source: {{ article.source.name }}</small>
-            </div>
-        {% endfor %}
-    </div>
+    <h1>ESP8266 LED Control</h1>
+    <button onclick="toggleLED()">Toggle LED</button>
+    <p id="status">LED is OFF</p>
 </body>
 </html>
