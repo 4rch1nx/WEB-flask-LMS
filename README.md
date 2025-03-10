@@ -1,2 +1,2 @@
 # WEB-flask-LMS
-For Yandex LMS
+**For Yandex LMS**
