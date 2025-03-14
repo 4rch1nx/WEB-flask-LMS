@@ -1,17 +1,5 @@
 {% extends "base.html" %}
 
 {% block content %}
-<script>
-        function toggleLED() {
-            fetch("/control/toggle_led")
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById("status").innerText = "LED is " + data;
-                })
-                .catch(error => console.error("Error:", error));
-        }
-    </script>
-<h1>ESP8266 LED Control</h1>
-<button type="button" class="btn btn-primary" onclick="toggleLED()">Toggle LED</button>
-<p id="status">LED is OFF</p>
+<div class="mb-3" data-coreui-toggle="range-slider" data-coreui-track="false" data-coreui-min="-100" data-coreui-max="100" data-coreui-value="50" data-coreui-vertical="true"></div>
 {% endblock %}

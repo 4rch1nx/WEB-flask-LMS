@@ -1,6 +1,5 @@
 import requests
 from flask import Flask, render_template, redirect
-import json
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -31,18 +30,26 @@ def index():
     description = get_description()
     return render_template("main.html", description=description)
 
+@app.route("/toggle_led")
+def toggle_led():
+    try:
+        response = requests.get(f"{ESP_IP}/toggle", timeout=2)
+        return response.text
+    except requests.exceptions.RequestException:
+        return "Error"
+
+@app.route("/check_status")
+def check_status():
+    try:
+        response = requests.get(f"{ESP_IP}/status", timeout=2)
+        if response.text == "CONNECTED":
+            return "ESP8266 is Online"
+    except requests.exceptions.RequestException:
+        return "ESP8266 is Offline"
 
 @app.route('/control')
 def control():
     return render_template("control.html")
-
-@app.route("/control/toggle_led")
-def toggle_led():
-    try:
-        response = requests.get(f"{ESP_IP}/toggle")
-        return response.text
-    except requests.exceptions.RequestException:
-        return "Error: ESP not reachable"
 
 @app.route('/algorithm')
 def algorithm():
@@ -77,4 +84,4 @@ def login():
 
 
 if __name__ == '__main__':
-    app.run(port=8080, host='127.0.0.1')
+    app.run(debug=True, port=8080, host='0.0.0.0')
