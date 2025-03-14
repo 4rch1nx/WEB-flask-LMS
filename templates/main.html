@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 style='font-size:30px; font-weight:100; font-family:Arial'>WEB Robotics</h1>
+{% for string in description %}
+    <div>{{ string }}</div>
+{% endfor %}
+{% endblock %}
