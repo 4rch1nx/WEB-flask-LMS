@@ -1,7 +1,7 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 
-const char* ssid = "ESP8266_AP";    // WiFi Name
+const char* ssid = "ESP8266_CAR_1";    // WiFi Name
 const char* password = "12345678";  // Password (min 8 chars)
 
 ESP8266WebServer server(80);
