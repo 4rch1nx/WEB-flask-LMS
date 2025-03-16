@@ -39,9 +39,15 @@
                 </li>
             </ul>
             <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="/personalisation"><i class="fas fa-2x fa-user"></i></a>
-                </li>
+                {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                    <a class="nav-link" href="/logout">{{current_user.name}}</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                    <a class="nav-link" href="/login"><i class="fas fa-2x fa-user"></i></a>
+                    </li>
+                {% endif %}
             </ul>
         </div>
     </nav>
