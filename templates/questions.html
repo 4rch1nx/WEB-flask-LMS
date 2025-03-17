@@ -1,5 +1,33 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Questions!</h1>
+    <h2>Задайте ваш вопрос админам WEBRobotics!</h2>
+    <br>
+    {% if current_user.is_authenticated %}
+        <form action="" method="post" novalidate>
+            {{ form.hidden_tag() }}
+            <p>
+                {{ form.theme.label }}
+                {{ form.theme(class="form-control")}}<br>
+                {% for error in form.theme.errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            </p>
+            <p>
+                {{ form.question.label }}<br>
+                {{ form.question(class="form-control")}}<br>
+                {% for error in form.question.errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            </p>
+            <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+        </form>
+    {% else %}
+        <div class="alert alert-danger" role="alert">Войдите в аккаунт / зарегистрируйтесь, чтобы
+        задать вопрос!</div>
+    {% endif %}
 {% endblock %}

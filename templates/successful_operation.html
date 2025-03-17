@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2> {{ page_title }}</h2>
+<div>
+    {{ message }}
+</div>
+<br>
+<a href="/main" class="btn btn-primary"> На главную </a>
+<br>
+<br>
+{% if other_button_message != "" %}
+    <a href={{redirection}} class="btn btn-secondary"> {{ other_button_message }}</a>
+{% endif %}
+{% endblock %}

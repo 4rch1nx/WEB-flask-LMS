@@ -1,68 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <style>
-        .vertical-slider {
-            writing-mode: bt-lr;
-            -webkit-appearance: slider-vertical;
-            width: 8px;
-            height: 200px;
-            padding: 0 5px;
-            margin: 20px;
-        }
-
-        .vertical-slider::-webkit-slider-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background-color: #007bff;
-            cursor: pointer;
-        }
-
-        .vertical-slider::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background-color: #007bff;
-            cursor: pointer;
-        }
-
-        .vertical-slider::-ms-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background-color: #007bff;
-            cursor: pointer;
-        }
-
-        .slider-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 250px;
-        }
-
-        .slider-label {
-            text-align: center;
-            margin-top: 10px;
-        }
-    </style>
-</head>
-<body>
-    <div class="slider-container">
-        <input type="range" min="-100" max="100" value="0" step="1" class="vertical-slider" orient="vertical">
-        <div class="slider-label">
-            <p>Значение:</p>
-            <span id="slider-value">0</span>
-        </div>
-    </div>
-
-    <script>
-        const slider = document.querySelector('.vertical-slider');
-        const sliderValue = document.getElementById('slider-value');
-
-        slider.addEventListener('input', function() {
-            sliderValue.textContent = this.value;
-        });
-    </script>
+<div data-coreui-toggle="range-slider"
+     data-coreui-value="25,75"
+     data-coreui-labels="Low, Medium, High">
+</div>
 {% endblock %}
