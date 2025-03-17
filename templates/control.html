@@ -1,8 +1,55 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div data-coreui-toggle="range-slider"
-     data-coreui-value="25,75"
-     data-coreui-labels="Low, Medium, High">
-</div>
+    <style>
+        .vertical-slider {
+            writing-mode: bt-lr;
+            -webkit-appearance: slider-vertical;
+            width: 8px;
+            height: 200px;
+            padding: 0 5px;
+            margin: 20px;
+        }
+
+        .slider-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 250px;
+        }
+
+        .slider-label {
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+
+    <div class="slider-container">
+        <input type="range" id="speed-slider" min="0" max="180" value="90" step="1" class="vertical-slider">
+        <div class="slider-label">
+            <p>Speed:</p>
+            <span id="slider-value">90</span>
+        </div>
+    </div>
+
+    <script>
+        const slider = document.getElementById('speed-slider');
+        const sliderValue = document.getElementById('slider-value');
+
+        slider.addEventListener('input', function() {
+            let speed = this.value;
+            sliderValue.textContent = speed;
+
+            fetch('/set_speed', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'speed=' + speed
+            })
+            .then(response => response.text())
+            .then(data => console.log("Response:", data))
+            .catch(error => console.error("Error:", error));
+        });
+    </script>
 {% endblock %}
