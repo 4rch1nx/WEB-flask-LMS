@@ -11,30 +11,6 @@
             margin: 20px;
         }
 
-        .vertical-slider::-webkit-slider-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background-color: #007bff;
-            cursor: pointer;
-        }
-
-        .vertical-slider::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background-color: #007bff;
-            cursor: pointer;
-        }
-
-        .vertical-slider::-ms-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background-color: #007bff;
-            cursor: pointer;
-        }
-
         .slider-container {
             display: flex;
             justify-content: center;
@@ -47,22 +23,33 @@
             margin-top: 10px;
         }
     </style>
-</head>
-<body>
+
     <div class="slider-container">
-        <input type="range" min="-100" max="100" value="0" step="1" class="vertical-slider" orient="vertical">
+        <input type="range" id="speed-slider" min="0" max="180" value="90" step="1" class="vertical-slider">
         <div class="slider-label">
-            <p>Значение:</p>
-            <span id="slider-value">0</span>
+            <p>Speed:</p>
+            <span id="slider-value">90</span>
         </div>
     </div>
 
     <script>
-        const slider = document.querySelector('.vertical-slider');
+        const slider = document.getElementById('speed-slider');
         const sliderValue = document.getElementById('slider-value');
 
         slider.addEventListener('input', function() {
-            sliderValue.textContent = this.value;
+            let speed = this.value;
+            sliderValue.textContent = speed;
+
+            fetch('/set_speed', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'speed=' + speed
+            })
+            .then(response => response.text())
+            .then(data => console.log("Response:", data))
+            .catch(error => console.error("Error:", error));
         });
     </script>
 {% endblock %}

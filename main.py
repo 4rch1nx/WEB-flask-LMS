@@ -3,7 +3,6 @@ from flask import Flask
 from flask import render_template, redirect, session, make_response, request, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 
-
 from data.users import User
 from data.devices import Devices
 from data import db_session
@@ -11,17 +10,18 @@ from forms.authorization import RegisterForm, LoginForm
 
 from constants import *
 
-
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 
 login_manager = LoginManager()
 login_manager.init_app(app)
 
+
 @login_manager.user_loader
 def load_user(user_id):
     db_sess = db_session.create_session()
     return db_sess.query(User).get(user_id)
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -46,6 +46,7 @@ def register():
         return redirect('/login')
     return render_template('register.html', title='Регистрация', form=form, message="")
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -60,11 +61,13 @@ def login():
                                form=form)
     return render_template('login.html', title='Авторизация', form=form, message="")
 
+
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect("/")
+
 
 def get_description():
     """
@@ -80,6 +83,7 @@ def get_description():
             i = i.strip()
         return description
 
+
 @app.route('/')
 @app.route('/main')
 def main():
@@ -90,6 +94,7 @@ def main():
     description = get_description()
     return render_template("main.html", description=description)
 
+
 @app.route("/toggle_led")
 def toggle_led():
     try:
@@ -97,6 +102,7 @@ def toggle_led():
         return response.text
     except requests.exceptions.RequestException:
         return "Error"
+
 
 @app.route("/check_status")
 def check_status():
@@ -107,33 +113,54 @@ def check_status():
     except requests.exceptions.RequestException:
         return "ESP8266 is Offline"
 
+
 @app.route('/control')
 def control():
     return render_template("control.html")
+
+
+@app.route("/set_speed", methods=["POST"])
+def set_speed():
+    speed = request.form.get("speed")
+    if speed is None or not speed.isdigit():
+        return "Invalid speed", 400
+
+    try:
+        response = requests.get(f"{ESP_IP}/servo?speed={speed}", timeout=2)
+        return response.text
+    except requests.exceptions.RequestException:
+        return "Error"
+
 
 @app.route('/algorithm')
 def algorithm():
     return render_template("algorithm.html")
 
+
 @app.route('/theory')
 def theory():
     return render_template("theory.html")
+
 
 @app.route('/documentation')
 def documentation():
     return render_template("documentation.html")
 
+
 @app.route('/devices')
 def devices():
     return render_template("devices.html")
+
 
 @app.route('/questions')
 def questions():
     return render_template("questions.html")
 
+
 @app.route('/about')
 def about():
     return render_template("about.html")
+
 
 # @app.route('/personalisation', methods=['GET', 'POST'])
 # def login():
