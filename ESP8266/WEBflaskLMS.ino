@@ -1,6 +1,6 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
-#include <ESP8266Servo.h>
+#include <Servo.h>
 
 const char* ssid = "ESP8266_CAR_1";
 const char* password = "12345678";
