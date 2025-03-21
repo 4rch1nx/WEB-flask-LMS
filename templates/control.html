@@ -25,13 +25,16 @@
     </style>
 
     <div class="slider-container">
-        <input type="range" id="speed-slider" min="0" max="180" value="90" step="1" class="vertical-slider">
+        <input type="range" id="speed-slider" min="-100" max="100" value="0" step="1" class="vertical-slider">
         <div class="slider-label">
             <p>Speed:</p>
-            <span id="slider-value">90</span>
+            <span id="slider-value">0</span>
         </div>
     </div>
 
+    {% for i in range(12) %}
+    <br>
+    {% endfor %}
     <script>
         const slider = document.getElementById('speed-slider');
         const sliderValue = document.getElementById('slider-value');
@@ -52,4 +55,7 @@
             .catch(error => console.error("Error:", error));
         });
     </script>
+{% for i in range(5) %}
+<br>
+{% endfor %}
 {% endblock %}

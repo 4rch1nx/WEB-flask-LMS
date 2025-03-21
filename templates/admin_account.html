@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-auto">
+            <div class="card mb-4 shadow" style="width: 350px">
+                <img src="static/img/base_account_photo.jpg" class="card-img-top" alt="">
+                <div class="card-body">
+                    <h4 style="text-align: center; font-family: Tektur, sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+  color: #017aee">
+                        {{ current_user.name }}
+                    </h4>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <h2> Вопросы пользователей </h2>
+            {% for question in questions %}
+                        <div class="col-md6 border rounded">
+                            <h5> Тема: </h5> {{ question.theme }}
+                            <h5> Вопрос: </h5> {{ question.question }}
+                            <br>
+                            <a href="/answer_question/{{ question.id }}" class="btn btn-primary"> Ответить </a>
+                        </div>
+                    <br>
+                    {% endfor %}
+            <a href="/logout" class="btn btn-danger"> Выйти </a>
+        </div>
+    </div>
+</div>
+{% for i in range(9) %}
+<br>
+{% endfor %}
+{% endblock %}

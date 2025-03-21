@@ -1,8 +1,21 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1 style='font-size:30px; font-weight:100; font-family:Arial'>WEB Robotics</h1>
+<p style="text-align: center;">
+    <img src="static/img/WEB_Robotics_logo.png" alt="" width="120" height="120">
+</p>
+<h1 class="text-center" style='font-family: "Tektur", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100;'>
+    WEB Robotics
+</h1>
 {% for string in description %}
-    <div>{{ string }}</div>
+    <div style="text-align: center;">{{ string }}</div>
+{% endfor %}
+{% for i in range(15) %}
+    <br>
 {% endfor %}
 {% endblock %}

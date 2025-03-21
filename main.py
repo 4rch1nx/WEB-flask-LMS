@@ -8,21 +8,20 @@ from flask_login import LoginManager, login_user, logout_user, login_required, c
 from data.users import User
 from data.devices import Devices
 from data import db_session
-from data.questions import Question
+from data.questions import Question, Answer
 
-from forms.authorization import RegisterForm, LoginForm
-from forms.questions import Question_form
-
+from forms.authorization import RegisterForm, LoginForm, ProfileEditingForm
+from forms.questions import Question_form, Answer_Question_form
 
 #импорт констант
 from constants import *
 
+app = Flask(__name__)  # объект приложения
+app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'  # секретный ключ для защиты от CSRF-атак
 
-app = Flask(__name__) # объект приложения
-app.config['SECRET_KEY'] = 'yandexlyceum_secret_key' # секретный ключ для защиты от CSRF-атак
-
-login_manager = LoginManager() #объект менеджера авторизации пользователей
+login_manager = LoginManager()  #объект менеджера авторизации пользователей
 login_manager.init_app(app)
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -34,6 +33,7 @@ def load_user(user_id):
     """
     db_sess = db_session.create_session()
     return db_sess.query(User).get(user_id)
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -65,6 +65,7 @@ def register():
         return redirect('/login')
     return render_template('register.html', title='Регистрация', form=form, message="")
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     """
@@ -86,6 +87,7 @@ def login():
                                form=form)
     return render_template('login.html', title='Авторизация', form=form, message="")
 
+
 @app.route('/logout')
 @login_required
 def logout():
@@ -98,6 +100,7 @@ def logout():
     """
     logout_user()
     return redirect("/")
+
 
 def get_description():
     """
@@ -113,6 +116,7 @@ def get_description():
             i = i.strip()
         return description
 
+
 @app.route('/')
 @app.route('/main')
 def main():
@@ -124,6 +128,7 @@ def main():
     description = get_description()
     return render_template("main.html", description=description)
 
+
 @app.route("/toggle_led")
 def toggle_led():
     try:
@@ -131,6 +136,7 @@ def toggle_led():
         return response.text
     except requests.exceptions.RequestException:
         return "Error"
+
 
 @app.route("/check_status")
 def check_status():
@@ -141,6 +147,7 @@ def check_status():
     except requests.exceptions.RequestException:
         return "ESP8266 is Offline"
 
+
 @app.route('/control')
 def control():
     """
@@ -149,6 +156,7 @@ def control():
     :rtype: html
     """
     return render_template("control.html")
+
 
 @app.route('/algorithm')
 def algorithm():
@@ -160,6 +168,7 @@ def algorithm():
     """
     return render_template("algorithm.html")
 
+
 @app.route('/theory')
 def theory():
     """
@@ -169,6 +178,7 @@ def theory():
     :rtype: html
     """
     return render_template("theory.html")
+
 
 @app.route('/documentation')
 def documentation():
@@ -180,6 +190,7 @@ def documentation():
     """
     return render_template("documentation.html")
 
+
 @app.route('/devices')
 def devices():
     """
@@ -189,6 +200,7 @@ def devices():
     :rtype: html
     """
     return render_template("devices.html")
+
 
 @app.route('/questions', methods=['GET', 'POST'])
 def questions():
@@ -211,6 +223,7 @@ def questions():
         return redirect("/successful_sending")
     else:
         return render_template("questions.html", form=form)
+
 
 @app.route('/successful_sending')
 def successful_sending():
@@ -237,6 +250,69 @@ def about():
     return render_template("about.html")
 
 
+@app.route('/account', methods=['GET', 'POST'])
+def account():
+    form = ProfileEditingForm()
+
+    db_sess = db_session.create_session()
+    questions = []
+    answers = []
+    if request.method == "GET":
+        users = db_sess.query(User).filter(User.id == current_user.id).first()
+        if users:
+            form.name.data = users.name
+            form.email.data = users.email
+            form.password.data = ''  # Или оставить пустым
+        db_answer = db_sess.query(Question).filter(Question.user_id == current_user.id)
+        for q in db_answer:
+            questions.append(q)
+        for i in questions:
+            answer = db_sess.query(Answer).filter(Answer.user_id == i.id).first()
+            answers.append(answer)
+
+    if form.validate_on_submit():
+        users = db_sess.query(User).filter(User.id == current_user.id).first()
+        if users:
+            users.name = form.name.data
+            users.email = form.email.data
+            if form.password.data:
+                users.set_password(form.password.data)
+            db_sess.commit()
+            return redirect("/main")
+        else:
+            abort(404)
+
+    return render_template('account.html', form=form, questions=questions, answers=answers, message="")
+
+
+@app.route('/admin_account')
+def admin_account():
+    db_sess = db_session.create_session()
+    all_questions = db_sess.query(Question)
+    questions = [q for q in all_questions]
+    return render_template("admin_account.html", questions=questions)
+
+
+@app.route('/answer_question/<int:id>', methods=['GET', 'POST'])
+def answer_question(id):
+    form = Answer_Question_form()
+    db_sess = db_session.create_session()
+    question = db_sess.query(Question).filter(Question.id == id).first()
+    if form.validate_on_submit():
+        answer = Answer(
+            question_theme=question.theme,
+            question=question.question,
+            answer=form.answer.data,
+            user_id=id
+        )
+        db_sess.add(answer)
+        db_sess.commit()
+        return redirect('/admin_account')
+    else:
+        #print(form)
+        return render_template('answer_the_question_form.html', form=form, question=question.question)
+
+
 if __name__ == '__main__':
-    db_session.global_init("db/blogs.db") #инициализация базы данных
-    app.run(debug=True, port=8080, host='0.0.0.0') #запуск сервера
+    db_session.global_init("db/main.db")  #инициализация базы данных
+    app.run(debug=True, port=8080, host='0.0.0.0')  #запуск сервера

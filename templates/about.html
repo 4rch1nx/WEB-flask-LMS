@@ -1,5 +1,68 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>About!</h1>
+    <style>
+        .about-section {
+            padding: 60px 0;
+            background-color: #f8f9fa;
+        }
+        .about-title {
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .about-text {
+            margin-bottom: 30px;
+        }
+    </style>
+    <div class="container about-section">
+    <h2 class="text-center about-title" style='font-size: 50px; font-family: "Tektur", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 300;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100;'> О нас </h2>
+        <p class="text-center about-text"> Alternative Vision - молодая и амбициозная команда юных программистов, стремящихся совершенствовать свои навыки и с каждым днём улучшать производимые продукты, принося пользу окружающим! </p>
+        <h3> Наши разработчики: </h3>
+        <br>
+    <div class="row">
+        <div class="col-md-4 text-center">
+            <div class="card mb-4 shadow">
+                <img src="static/img/Andrew_Rtishchev.jpg" class="card-img-top" alt="Наши разработчи">
+                <div class="card-body">
+                    <h5 class="card-title"> Ртищев Андрей</h5>
+                    <p class="card-text"> Робототехник, инженер, ардуинщик. Обычно из-под его рук выходят работающие железки!</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 text-center">
+            <div class="card mb-4 shadow">
+                <img src="static/img/Vanya_Kotov.jpg" class="card-img-top" alt="Наша команда">
+                <div class="card-body">
+                    <h5 class="card-title"> Котов Иван</h5>
+                    <p class="card-text"> Программист, фронтэндер, тестировщик. Занимается оформлением сайта и картиночками...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+        <h3> Другие проекты </h3>
+        <br>
+    <div class="row">
+        <div class="col-md-4 text-center">
+            <div class="card mb-4 shadow">
+                <img src="static/img/Rise_of_empire_logo.jpg" class="card-img-top" alt="">
+                <div class="card-body">
+                    <h5 class="card-title"> Rise of Empire </h5>
+                    <p class="card-text"> Игра, заключающаяся в развитии персонажа на открытой карте с целью победы над главным боссом</p>
+                    <a href="https://github.com/Andrew-24coop/PygameProject"> Узнать больше </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="text-center mt-4">
+        <a href="/questions" class="btn btn-secondary"> Остались вопросы? Задавайте! </a>
+    </div>
+</div>
 {% endblock %}

@@ -1,33 +1,48 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h2>Задайте ваш вопрос админам WEBRobotics!</h2>
+    <h2 style="font-family: Tektur,
+    sans-serif;
+    font-optical-sizing: auto;
+    font-weight: <weight>;
+    font-style: normal;
+    font-variation-settings: wdth 100;">
+        Задайте ваш вопрос админам WEBRobotics!
+    </h2>
     <br>
     {% if current_user.is_authenticated %}
-        <form action="" method="post" novalidate>
-            {{ form.hidden_tag() }}
-            <p>
-                {{ form.theme.label }}
-                {{ form.theme(class="form-control")}}<br>
-                {% for error in form.theme.errors %}
-                    <div class="alert alert-danger" role="alert">
-                        {{ error }}
-                    </div>
-                {% endfor %}
-            </p>
-            <p>
-                {{ form.question.label }}<br>
-                {{ form.question(class="form-control")}}<br>
-                {% for error in form.question.errors %}
-                    <div class="alert alert-danger" role="alert">
-                        {{ error }}
-                    </div>
-                {% endfor %}
-            </p>
-            <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
-        </form>
+        {% if current_user.name != "Admin" %}
+            <form action="" method="post" novalidate>
+                {{ form.hidden_tag() }}
+                <p>
+                    {{ form.theme.label }}
+                    {{ form.theme(class="form-control")}}<br>
+                    {% for error in form.theme.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+                </p>
+                <p>
+                    {{ form.question.label }}<br>
+                    {{ form.question(class="form-control")}}<br>
+                    {% for error in form.question.errors %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+                </p>
+                <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+            </form>
+        {% else %}
+            <div class="alert alert-danger" role="alert"> Вы не можете задать вопрос из аккауета
+            админа! Войдите в другую учётную запись! </div>
+        {% endif %}
     {% else %}
         <div class="alert alert-danger" role="alert">Войдите в аккаунт / зарегистрируйтесь, чтобы
         задать вопрос!</div>
     {% endif %}
+{% for i in range(19) %}
+    <br>
+{% endfor %}
 {% endblock %}
