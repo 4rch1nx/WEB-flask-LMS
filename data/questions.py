@@ -13,7 +13,7 @@ class Question(SqlAlchemyBase):
     question = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     user_id = sqlalchemy.Column(sqlalchemy.Integer,
                                 sqlalchemy.ForeignKey("users.id"))
-    is_answered = sqlalchemy.Column(sqlalchemy.Boolean, nullable=False, default=True)
+    is_answered = sqlalchemy.Column(sqlalchemy.Boolean, nullable=False, default=False)
     user = orm.relationship('User')
     answers = orm.relationship("Answer", back_populates='questions')
 
@@ -25,6 +25,6 @@ class Answer(SqlAlchemyBase):
     question_theme = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     question = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     answer = sqlalchemy.Column(sqlalchemy.String, nullable=False)
-    user_id = sqlalchemy.Column(sqlalchemy.Integer,
+    question_id = sqlalchemy.Column(sqlalchemy.Integer,
                                 sqlalchemy.ForeignKey("questions.id"))
     questions = orm.relationship('Question')

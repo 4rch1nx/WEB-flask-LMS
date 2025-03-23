@@ -6,7 +6,7 @@ from flask_login import UserMixin
 
 
 from .db_session import SqlAlchemyBase
-
+from constants import DEFAULT_PROFILE_PHOTO
 
 class User(SqlAlchemyBase, UserMixin):
     __tablename__ = 'users'
@@ -17,6 +17,7 @@ class User(SqlAlchemyBase, UserMixin):
     email = sqlalchemy.Column(sqlalchemy.String,
                               index=True, unique=True, nullable=True)
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    src_avatar = sqlalchemy.Column(sqlalchemy.String, nullable=False, default=DEFAULT_PROFILE_PHOTO)
     devices = orm.relationship("Devices", back_populates='user')
     questions = orm.relationship("Question", back_populates='user')
     def set_password(self, password):

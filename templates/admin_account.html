@@ -19,15 +19,20 @@
         </div>
         <div class="col">
             <h2> Вопросы пользователей </h2>
-            {% for question in questions %}
-                        <div class="col-md6 border rounded">
-                            <h5> Тема: </h5> {{ question.theme }}
-                            <h5> Вопрос: </h5> {{ question.question }}
-                            <br>
-                            <a href="/answer_question/{{ question.id }}" class="btn btn-primary"> Ответить </a>
-                        </div>
-                    <br>
-                    {% endfor %}
+            {% if questions %}
+                {% for question in questions %}
+                            <div class="col-md6 border rounded">
+                                <h5> Тема: </h5> {{ question.theme }}
+                                <h5> Вопрос: </h5> {{ question.question }}
+                                <br>
+                                <br>
+                                <a href="/answer_question/{{ question.id }}" class="btn btn-primary"> Ответить </a>
+                            </div>
+                        <br>
+                        {% endfor %}
+            {% else %}
+                <p class="alert alert-danger" role="alert"> Вопросов пока нет</p>
+            {% endif %}
             <a href="/logout" class="btn btn-danger"> Выйти </a>
         </div>
     </div>

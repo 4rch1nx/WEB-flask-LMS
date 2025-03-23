@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-md-auto">
             <div class="card mb-4 shadow" style="width: 350px">
-                <img src="static/img/base_account_photo.jpg" class="card-img-top" alt="">
+                <img src="{{input_src}}" class="card-img-top" alt="">
                 <div class="card-body">
                     <h4 style="text-align: center; font-family: Tektur, sans-serif;
   font-optical-sizing: auto;
@@ -17,8 +17,19 @@
                 </div>
             </div>
             <div>
-                <a href="/change_photo/1" class="btn btn-secondary"> Заменить фото </a>
-                <a href="/change_photo/0" class="btn btn-secondary"> Установить базовое </a>
+                <form method="post" enctype="multipart/form-data">
+                    <div>
+	                    <label for="photo" class="form-label" style="font-weight: 500"> Выбрать своё фото: </label>
+                        <input class="form-control" type="file" accept=".jpg" id="photo" name="profile_photo">
+                    </div>
+                    <br>
+                    <button type="submit" class="btn btn-primary"> Установить </button>
+                </form>
+                <br>
+                {% if message %}
+                <div class="alert alert-danger" role="alert">{{ message }}</div>
+                {% endif %}
+                <a href="/delete_photo" class="btn btn-danger"> Удалить фото </a>
             </div>
         </div>
         <div class="col">
@@ -53,10 +64,6 @@
                 <div class="mb-3">
                     {{ form.submit(class="btn btn-primary") }}
                 </div>
-
-                {% if message %}
-                <div class="alert alert-danger" role="alert">{{ message }}</div>
-                {% endif %}
             </form>
             <a href="/logout" class="btn btn-danger"> Выйти из аккаунта </a>
             <br>
@@ -88,4 +95,7 @@
         </div>
     </div>
 </div>
+{% for i in range(3) %}
+    <br>
+{% endfor %}
 {% endblock %}

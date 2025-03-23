@@ -1,7 +1,8 @@
 # импорт необходимых модулей
 import requests
+import base64
 from flask import Flask
-from flask import render_template, redirect, session, make_response, request, abort
+from flask import render_template, redirect, session, make_response, request, abort, url_for
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 
 #импорт классов из других файлов
@@ -148,14 +149,20 @@ def check_status():
         return "ESP8266 is Offline"
 
 
-@app.route('/control')
+@app.route('/control', methods=['GET', 'POST'])
 def control():
     """
     Функция рендеринга страницы, на которой находится система управления машинкой
     :return: control.html
     :rtype: html
     """
-    return render_template("control.html")
+    if request.method == 'GET':
+        return render_template("control.html", src_inpt="static/img/base_account_photo.jpg")
+    elif request.method == 'POST':
+        f = request.files['file']
+        img = str(base64.b64encode(bytes(f.read())))
+        img = img[2:-2]
+        return render_template("control.html", src_inpt=f"data:image/jpeg;base64, {img}")
 
 
 @app.route('/algorithm')
@@ -262,15 +269,16 @@ def account():
         if users:
             form.name.data = users.name
             form.email.data = users.email
-            form.password.data = ''  # Или оставить пустым
-        db_answer = db_sess.query(Question).filter(Question.user_id == current_user.id)
+            form.password.data = ''
+        db_answer = db_sess.query(Question).filter(Question.user_id == users.id)
         for q in db_answer:
             questions.append(q)
         for i in questions:
-            answer = db_sess.query(Answer).filter(Answer.user_id == i.id).first()
-            answers.append(answer)
+            answer = db_sess.query(Answer).filter(Answer.question_id == i.id).first()
+            if answer is not None:
+                answers.append(answer)
 
-    if form.validate_on_submit():
+    if request.method == "POST" and form.validate_on_submit():
         users = db_sess.query(User).filter(User.id == current_user.id).first()
         if users:
             users.name = form.name.data
@@ -281,15 +289,36 @@ def account():
             return redirect("/main")
         else:
             abort(404)
+    if request.method == "POST" and not form.validate_on_submit():
+        file = request.files['profile_photo']
+        photo = str(base64.b64encode(bytes(file.read())))
+        if len(photo) > 3:
+            photo = photo[2:-2]
+            user = db_sess.query(User).filter(User.id == current_user.id).first()
+            user.src_avatar = f"data:image/jpeg;base64, {photo}"
+            db_sess.commit()
+        return redirect("/account")
 
-    return render_template('account.html', form=form, questions=questions, answers=answers, message="")
+    return render_template('account.html', form=form, questions=questions,
+                           answers=answers, message="", input_src=current_user.src_avatar)
 
+@app.route("/delete_photo")
+def delete_photo():
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.id == current_user.id).first()
+    user.src_avatar = DEFAULT_PROFILE_PHOTO
+    db_sess.commit()
+    return redirect("/account")
 
 @app.route('/admin_account')
 def admin_account():
     db_sess = db_session.create_session()
     all_questions = db_sess.query(Question)
-    questions = [q for q in all_questions]
+    questions = []
+    for q in all_questions:
+        if q is not None:
+            if not q.is_answered:
+                questions.append(q)
     return render_template("admin_account.html", questions=questions)
 
 
@@ -303,8 +332,9 @@ def answer_question(id):
             question_theme=question.theme,
             question=question.question,
             answer=form.answer.data,
-            user_id=id
+            question_id=id
         )
+        question.is_answered = True
         db_sess.add(answer)
         db_sess.commit()
         return redirect('/admin_account')
