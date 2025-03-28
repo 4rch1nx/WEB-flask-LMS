@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<script>
+        function toggleLED() {
+            fetch("/toggle_led")
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById("status").innerText = "LED is " + data;
+                })
+                .catch(error => console.error("Error:", error));
+        }
+
+        function checkStatus() {
+            fetch("/check_status")
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById("connection").innerText = data;
+                })
+                .catch(error => console.error("Error:", error));
+        }
+
+        setInterval(checkStatus, 5000);  // Auto-check every 5 seconds
+    </script>
+<h1>ESP8266 LED Control</h1>
+<p id="connection">Checking ESP8266...</p>
+<button type="button" class="btn btn-primary" onclick="toggleLED()">Toggle LED</button>
+<p id="status">LED is OFF</p>
+
+{% for i in range(17) %}
+    <br>
+{% endfor %}
+{% endblock %}

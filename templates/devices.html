@@ -1,33 +1,46 @@
 {% extends "base.html" %}
 
 {% block content %}
-<script>
-        function toggleLED() {
-            fetch("/toggle_led")
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById("status").innerText = "LED is " + data;
-                })
-                .catch(error => console.error("Error:", error));
-        }
-
-        function checkStatus() {
-            fetch("/check_status")
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById("connection").innerText = data;
-                })
-                .catch(error => console.error("Error:", error));
-        }
-
-        setInterval(checkStatus, 5000);  // Auto-check every 5 seconds
-    </script>
-<h1>ESP8266 LED Control</h1>
-<p id="connection">Checking ESP8266...</p>
-<button type="button" class="btn btn-primary" onclick="toggleLED()">Toggle LED</button>
-<p id="status">LED is OFF</p>
-
-{% for i in range(17) %}
+<h2 style='font-family: "Tektur", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100;'> Мои устройства </h2>
+<br>
+<br>
+{% if not current_user.is_authenticated %}
+    <div class="alert alert-danger" role="alert">Войдите в аккаунт / зарегистрируйтесь, чтобы
+        просмотреть ваши устройства!</div>
+{% else %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <hr>
+            <a href="/searching_for_esp" class="btn btn-primary"> Поиск устройств в локальной сети </a>
+            <hr>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            {% if user_devices != [] %}
+                {% for device in user_devices %}
+                    <div class="col-md6 border rounded">
+                        <a> Имя устройства: </a> {{ device.name }}
+                        <a> Ssid: </a> {{ device.ssid }}
+                        <a href="/connect_to_esp/{{device.id}}" class="btn btn-secondary"> Подключиться </a>
+                        <a href="/about_device/{{device.id}}" class="btn btn-secondary"> Об устройстве  </a>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-primary" role="alert" style="text-align: center;">
+                    У вас нет сохранённых устройств. </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+{% for i in range(22) %}
     <br>
 {% endfor %}
 {% endblock %}

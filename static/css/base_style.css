@@ -1,0 +1,4 @@
+@import "stylus"
+
+#slider-vertical{background: #343232;}
+span.ui-slider-handle{background: #1E8ABC;}

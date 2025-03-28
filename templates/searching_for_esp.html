@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+ <h2 style='font-family: "Tektur", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: <weight>;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100;'> Поиск устройств... </h2>
+<br>
+<br>
+{% if available_esp == [] %}
+    <div class="alert alert-danger" role="alert"> Не удалось найти устройства! Проверьте,
+    включен ли ваш робот! В случае повторения ошибок <a href="/questions"> задайте вопрос</a> разработчикам.</div>
+{% else %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1> Найденные устройства: </h1>
+            {% for device in available_esp %}
+                <div class="col-md6 border rounded">
+                    <a> Ssid: </a> {{ device.ssid }}
+                    <a href="/connect_to_esp_ssid/{{device.ssid}}" class="btn btn-secondary"> Подключиться </a>
+                    <a href="/save_device/{{device.ssid}}" class="btn btn-secondary"> Сохранить </a>
+                </div>
+            {% endfor %}
+            <hr>
+        </div>
+    </div>
+</div>
+{% endif %}
+<br>
+<br>
+<a href="/searching_for_esp" class="btn btn-primary"> Попробовать снова  </a>
+<br>
+<br>
+<a href="/devices" class="btn btn-danger"> Назад к моим устройствам </a>
+{% for i in range(22) %}
+    <br>
+{% endfor %}
+{% endblock %}

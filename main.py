@@ -17,6 +17,9 @@ from forms.questions import Question_form, Answer_Question_form
 #импорт констант
 from constants import *
 
+# импорт функций для работы с ESP
+from esp_connection import *
+
 app = Flask(__name__)  # объект приложения
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'  # секретный ключ для защиты от CSRF-атак
 
@@ -203,10 +206,21 @@ def devices():
     """
     Функция рендеринга страницы, на которой находится информация об устройствах
     конкретного пользователя
-    :return: devices.html
+    :return: toggle.html
     :rtype: html
     """
-    return render_template("devices.html")
+    db_sess = db_session.create_session()
+    db_sess.query()
+    user_devices = list(db_sess.query(Devices).filter(Devices.id == current_user.id))
+    return render_template("devices.html", user_devices=user_devices)
+
+@app.route('/searching_for_esp', methods=['GET', 'POST'])
+def searching_for_esp():
+    available_esp = find_ESP()
+    esp_list = []
+    if available_esp is not None:
+        esp_list = available_esp
+    return render_template("searching_for_esp.html", available_esp=esp_list)
 
 
 @app.route('/questions', methods=['GET', 'POST'])
@@ -251,7 +265,7 @@ def about():
     """
     Функция рендеринга страницы, на которой находится информация о разработчиках
     приложения
-    :return: devices.html
+    :return: toggle.html
     :rtype: html
     """
     return render_template("about.html")
