@@ -8,11 +8,6 @@
   font-variation-settings:
     "wdth" 100;'> Мои устройства </h2>
 <br>
-<br>
-{% if not current_user.is_authenticated %}
-    <div class="alert alert-danger" role="alert">Войдите в аккаунт / зарегистрируйтесь, чтобы
-        просмотреть ваши устройства!</div>
-{% else %}
 <div class="container">
     <div class="row">
         <div class="col">
@@ -21,25 +16,30 @@
             <hr>
         </div>
     </div>
-    <div class="row">
-        <div class="col">
-            {% if user_devices != [] %}
-                {% for device in user_devices %}
-                    <div class="col-md6 border rounded">
-                        <a> Имя устройства: </a> {{ device.name }}
-                        <a> Ssid: </a> {{ device.ssid }}
-                        <a href="/connect_to_esp/{{device.id}}" class="btn btn-secondary"> Подключиться </a>
-                        <a href="/about_device/{{device.id}}" class="btn btn-secondary"> Об устройстве  </a>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <div class="alert alert-primary" role="alert" style="text-align: center;">
-                    У вас нет сохранённых устройств. </div>
-            {% endif %}
+    <h3> Сохранённые устройства:</h3>
+    {% if not current_user.is_authenticated %}
+    <div class="alert alert-danger" role="alert">Войдите в аккаунт / зарегистрируйтесь, чтобы
+        просмотреть сохранённые устройства!</div>
+    {% else %}
+        <div class="row">
+            <div class="col">
+                {% if user_devices != [] %}
+                    {% for device in user_devices %}
+                        <div class="col-md6 border rounded">
+                            <a> Имя устройства: </a> {{ device.name }}
+                            <a> Ssid: </a> {{ device.ssid }}
+                            <a href="/connect_to_esp/{{device.id}}" class="btn btn-secondary"> Подключиться </a>
+                            <a href="/about_device/{{device.id}}" class="btn btn-secondary"> Об устройстве  </a>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-primary" role="alert" style="text-align: center;">
+                        У вас нет сохранённых устройств. </div>
+                {% endif %}
+            </div>
         </div>
-    </div>
+    {% endif %}
 </div>
-{% endif %}
 {% for i in range(22) %}
     <br>
 {% endfor %}

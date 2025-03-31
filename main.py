@@ -10,15 +10,20 @@ from data.users import User
 from data.devices import Devices
 from data import db_session
 from data.questions import Question, Answer
+from data.saved_algorithms import Saved_algorithm
 
 from forms.authorization import RegisterForm, LoginForm, ProfileEditingForm
 from forms.questions import Question_form, Answer_Question_form
+from forms.algorithm_editor import Algorithm_form
 
 #импорт констант
 from constants import *
 
 # импорт функций для работы с ESP
 from esp_connection import *
+
+# импорт функций для обработки алгоритма движения робота
+from code_reader import *
 
 app = Flask(__name__)  # объект приложения
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'  # секретный ключ для защиты от CSRF-атак
@@ -159,16 +164,10 @@ def control():
     :return: control.html
     :rtype: html
     """
-    if request.method == 'GET':
-        return render_template("control.html", src_inpt="static/img/base_account_photo.jpg")
-    elif request.method == 'POST':
-        f = request.files['file']
-        img = str(base64.b64encode(bytes(f.read())))
-        img = img[2:-2]
-        return render_template("control.html", src_inpt=f"data:image/jpeg;base64, {img}")
+    return render_template("control.html", src_inpt="static/img/base_account_photo.jpg")
 
 
-@app.route('/algorithm')
+@app.route('/algorithm', methods=['GET', 'POST'])
 def algorithm():
     """
     Функция рендеринга страницы, на которой находится система составления алгоритма
@@ -176,7 +175,63 @@ def algorithm():
     :return: algorithm.html
     :rtype: html
     """
-    return render_template("algorithm.html")
+    form = Algorithm_form()
+    code_error_message = ""
+    saving_error_message = ""
+    if form.validate_on_submit():
+        code = form.code_field.data
+        if code != "" and not form.run_algorithm_button.data:
+            code += "\n"
+        if form.go_ahead_button.data:
+            code += "вперёд(10)"
+        elif form.go_back_button.data:
+            code += "назад(10)"
+        elif form.turn_right_button.data:
+            code += "направо(1)"
+        elif form.turn_left_button.data:
+            code += "налево(1)"
+        elif form.run_algorithm_button.data:
+            if code != "":
+                functions = read_code(code)
+                if type(functions) == str:
+                    code_error_message = functions
+        elif form.save_algorithm_button.data:
+            if current_user.is_authenticated:
+                if code != "":
+                    error = find_errors_in_code(code)
+                    if error is None:
+                        db_sess = db_session.create_session()
+                        saved_algorithm = Saved_algorithm(
+                            algorithm=code,
+                            user_id=current_user.id
+                        )
+                        db_sess.add(saved_algorithm)
+                        db_sess.merge(current_user)
+                        db_sess.commit()
+                        return redirect('/successful_saving')
+                    else:
+                        saving_error_message = error
+                else:
+                    saving_error_message = "Нельзя сохранять пустой код!"
+            else:
+                saving_error_message = "Войдите в аккаунт / зарегистрируйтесь, чтобы сохранить ваш код!"
+        form.code_field.data = code
+    return render_template("algorithm.html", form=form, code_error_message=code_error_message,
+                           saving_error_message=saving_error_message)
+
+
+@app.route('/successful_saving')
+def successful_saving():
+    """
+    Функция для рендеринга страницы, на которой отображается сообщение
+    об успешном сохранении алгоритма движения робота
+    :return: successful_operation.html
+    :rtype: html
+    """
+    return render_template("successful_operation.html", page_title="Алгоритм сохранён!",
+                           message="",
+                           other_button_message="Продолжить писать алгоритм",
+                           redirection="/algorithm")
 
 
 @app.route('/theory')
@@ -209,10 +264,12 @@ def devices():
     :return: toggle.html
     :rtype: html
     """
-    db_sess = db_session.create_session()
-    db_sess.query()
-    user_devices = list(db_sess.query(Devices).filter(Devices.id == current_user.id))
+    user_devices = []
+    if current_user.is_authenticated:
+        db_sess = db_session.create_session()
+        user_devices = list(db_sess.query(Devices).filter(Devices.id == current_user.id))
     return render_template("devices.html", user_devices=user_devices)
+
 
 @app.route('/searching_for_esp', methods=['GET', 'POST'])
 def searching_for_esp():
@@ -250,7 +307,7 @@ def questions():
 def successful_sending():
     """
     Функция для рендеринга страницы, на которой отображается сообщение
-    об успешной отправке вопроса разработчика
+    об успешной отправке вопроса разработчикам
     :return: successful_operation.html
     :rtype: html
     """
@@ -316,6 +373,7 @@ def account():
     return render_template('account.html', form=form, questions=questions,
                            answers=answers, message="", input_src=current_user.src_avatar)
 
+
 @app.route("/delete_photo")
 def delete_photo():
     db_sess = db_session.create_session()
@@ -323,6 +381,7 @@ def delete_photo():
     user.src_avatar = DEFAULT_PROFILE_PHOTO
     db_sess.commit()
     return redirect("/account")
+
 
 @app.route('/admin_account')
 def admin_account():

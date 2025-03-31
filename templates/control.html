@@ -6,7 +6,7 @@
         height: 160px;
         display: flex;
         align-items: center;
-        transform: rotate(270deg)
+        transform: rotate(270deg);
     }
 
   .slider input[type="range"]{
@@ -66,9 +66,30 @@
 
 <div class="container">
     <div class="row">
+        <h2 style='font-family: "Tektur", sans-serif;
+                  font-optical-sizing: auto;
+                  font-weight: <weight>;
+                  font-style: normal;
+                  font-variation-settings:
+                    "wdth" 100;'> Управление роботом </h2>
+        <p> Управляйте вашим роботом как обычной радиоуправляемой машинкой! Здесь же будет изображение,
+        полученной с видеокамеры робота!</p>
+    </div>
+    <br>
+    <br>
+    <div class="row">
         <div class="slider col">
             <input type="range" min="-100" max="100" step="1" value="" id="sss_left">
             <div class="val" id="value_left">0</div>
+        </div>
+        <div class="col-md-auto" style="text-align: center;">
+            <a href="/control/start" class="btn btn-primary" style="width: 200px; height: 40px;"> Старт </a>
+            <br>
+            <br>
+            <a href="/control" class="btn btn-primary" style="width: 200px; height: 40px;"> Стоп </a>
+            <br>
+            <br>
+            <p> Изображение с камеры:</p>
         </div>
         <div class="slider col">
             <input type="range" min="-100" max="100" step="1" value="" id="sss_right">
