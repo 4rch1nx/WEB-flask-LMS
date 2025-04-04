@@ -13,7 +13,7 @@ from data.questions import Question, Answer
 from data.saved_algorithms import Saved_algorithm
 
 from forms.authorization import RegisterForm, LoginForm, ProfileEditingForm
-from forms.questions import Question_form, Answer_Question_form
+from forms.questions import Question_form, Answer_Question_form, Changing_question_form
 from forms.algorithm_editor import Algorithm_form
 
 #импорт констант
@@ -167,6 +167,58 @@ def control():
     return render_template("control.html", src_inpt="static/img/base_account_photo.jpg")
 
 
+# @app.route('/algorithm', methods=['GET', 'POST'])
+# def algorithm():
+#     """
+#     Функция рендеринга страницы, на которой находится система составления алгоритма
+#     движений машинки
+#     :return: algorithm.html
+#     :rtype: html
+#     """
+#     form = Algorithm_form()
+#     code_error_message = ""
+#     saving_error_message = ""
+#     if form.validate_on_submit():
+#         code = form.code_field.data
+#         if code != "" and not form.run_algorithm_button.data:
+#             code += "\n"
+#         if form.go_ahead_button.data:
+#             code += "вперёд(10)"
+#         elif form.go_back_button.data:
+#             code += "назад(10)"
+#         elif form.turn_right_button.data:
+#             code += "направо(1)"
+#         elif form.turn_left_button.data:
+#             code += "налево(1)"
+#         elif form.run_algorithm_button.data:
+#             if code != "":
+#                 functions = read_code(code)
+#                 if type(functions) == str:
+#                     code_error_message = functions
+#         elif form.save_algorithm_button.data:
+#             if current_user.is_authenticated:
+#                 if code != "":
+#                     error = find_errors_in_code(code)
+#                     if error is None:
+#                         db_sess = db_session.create_session()
+#                         saved_algorithm = Saved_algorithm(
+#                             algorithm=code,
+#                             user_id=current_user.id
+#                         )
+#                         db_sess.add(saved_algorithm)
+#                         db_sess.merge(current_user)
+#                         db_sess.commit()
+#                         return redirect('/successful_saving')
+#                     else:
+#                         saving_error_message = error
+#                 else:
+#                     saving_error_message = "Нельзя сохранять пустой код!"
+#             else:
+#                 saving_error_message = "Войдите в аккаунт / зарегистрируйтесь, чтобы сохранить ваш код!"
+#         form.code_field.data = code
+#     return render_template("algorithm.html", form=form, code_error_message=code_error_message,
+#                            saving_error_message=saving_error_message)
+
 @app.route('/algorithm', methods=['GET', 'POST'])
 def algorithm():
     """
@@ -179,18 +231,8 @@ def algorithm():
     code_error_message = ""
     saving_error_message = ""
     if form.validate_on_submit():
-        code = form.code_field.data
-        if code != "" and not form.run_algorithm_button.data:
-            code += "\n"
-        if form.go_ahead_button.data:
-            code += "вперёд(10)"
-        elif form.go_back_button.data:
-            code += "назад(10)"
-        elif form.turn_right_button.data:
-            code += "направо(1)"
-        elif form.turn_left_button.data:
-            code += "налево(1)"
-        elif form.run_algorithm_button.data:
+        code = request.form["textarea_for_algorithm"]
+        if form.run_algorithm_button.data:
             if code != "":
                 functions = read_code(code)
                 if type(functions) == str:
@@ -215,9 +257,8 @@ def algorithm():
                     saving_error_message = "Нельзя сохранять пустой код!"
             else:
                 saving_error_message = "Войдите в аккаунт / зарегистрируйтесь, чтобы сохранить ваш код!"
-        form.code_field.data = code
-    return render_template("algorithm.html", form=form, code_error_message=code_error_message,
-                           saving_error_message=saving_error_message)
+    return render_template("algorithm.html", code_error_message=code_error_message,
+                           saving_error_message=saving_error_message, form=form)
 
 
 @app.route('/successful_saving')
@@ -225,13 +266,14 @@ def successful_saving():
     """
     Функция для рендеринга страницы, на которой отображается сообщение
     об успешном сохранении алгоритма движения робота
-    :return: successful_operation.html
+    :return: result_of_operation.html
     :rtype: html
     """
-    return render_template("successful_operation.html", page_title="Алгоритм сохранён!",
+    return render_template("result_of_operation.html", page_title="Алгоритм сохранён!",
                            message="",
                            other_button_message="Продолжить писать алгоритм",
-                           redirection="/algorithm")
+                           redirection="/algorithm",
+                           successful=True)
 
 
 @app.route('/theory')
@@ -276,8 +318,57 @@ def searching_for_esp():
     available_esp = find_ESP()
     esp_list = []
     if available_esp is not None:
-        esp_list = available_esp
+        esp_list = available_esp.values()
     return render_template("searching_for_esp.html", available_esp=esp_list)
+
+
+@app.route('/connect_to_esp_ssid/<ssid>')
+def connect_to_esp_ssid(ssid):
+    try:
+        connect_to_wifi(ssid)
+        return redirect(f'/successful_connection/{ssid}')
+    except:
+        return redirect(f'/connection_error/{ssid}')
+
+
+@app.route('/successful_connection/<ssid>')
+def render_successful_connection(ssid):
+    return render_template("result_of_operation.html", page_title=f"Устройство {ssid} успешно подключено!",
+                           message="",
+                           other_button_message="Начать управлять машинкой",
+                           redirection="/control",
+                           successful=True)
+
+
+@app.route('/connection_error/<ssid>')
+def render_connection_error(ssid):
+    return render_template("result_of_operation.html", page_title=f"Не удалось подключиться!",
+                           message=f"Ошибка в подключении устройства {ssid}! В случае повторения ошибок задайте вопрос разработчикам!",
+                           other_button_message="Попробовать снова",
+                           redirection=f"/connect_to_esp_ssid/{ssid}",
+                           successful=False)
+
+
+@app.route('/save_device/<ssid>')
+def save_device(ssid):
+    db_sess = db_session.create_session()
+    device = Devices(
+        name=ssid,
+        ssid=ssid
+    )
+    current_user.devices.append(device)
+    db_sess.merge(current_user)
+    db_sess.commit()
+    return redirect(f"/successful_device_saving/{ssid}")
+
+@app.route('/successful_device_saving/<ssid>')
+def render_successful_device_saving(ssid):
+    return render_template("result_of_operation.html",
+                           page_title=f"Устройство {ssid} сохранено!",
+                           message="Вы можете найти сохраненные вами устройства на странице 'Мои устройства'. ",
+                           other_button_message="Мои устройства",
+                           redirection=f"/devices",
+                           successful=True)
 
 
 @app.route('/questions', methods=['GET', 'POST'])
@@ -289,6 +380,7 @@ def questions():
     :rtype: html
     """
     form = Question_form()
+    page_title = "Задайте вопрос админам WEBRobotics!"
     if request.method == "POST":
         db_sess = db_session.create_session()
         question = Question(
@@ -300,7 +392,7 @@ def questions():
         db_sess.commit()
         return redirect("/successful_sending")
     else:
-        return render_template("questions.html", form=form)
+        return render_template("questions.html", form=form, page_title=page_title)
 
 
 @app.route('/successful_sending')
@@ -308,13 +400,14 @@ def successful_sending():
     """
     Функция для рендеринга страницы, на которой отображается сообщение
     об успешной отправке вопроса разработчикам
-    :return: successful_operation.html
+    :return: result_of_operation.html
     :rtype: html
     """
-    return render_template("successful_operation.html", page_title="Вопрос отправлен!",
+    return render_template("result_of_operation.html", page_title="Вопрос отправлен!",
                            message="Спасибо за отправку вопроса! Админ ответит Вам в ближайшее время!",
                            other_button_message="Задать еще вопрос",
-                           redirection="/questions")
+                           redirection="/questions",
+                           successful=True)
 
 
 @app.route('/about')
@@ -379,6 +472,36 @@ def delete_photo():
     db_sess = db_session.create_session()
     user = db_sess.query(User).filter(User.id == current_user.id).first()
     user.src_avatar = DEFAULT_PROFILE_PHOTO
+    db_sess.commit()
+    return redirect("/account")
+
+
+@app.route("/сhanging_question/<int:id>", methods=['GET', 'POST'])
+def change_question(id):
+    page_title = "Изменение вопроса"
+
+    form = Changing_question_form()
+    if request.method == "GET":
+        db_sess = db_session.create_session()
+        question = db_sess.query(Question).filter(Question.id == id, Question.user_id == current_user.id).first()
+
+        form.theme.data = question.theme
+        form.question.data = question.question
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        question = db_sess.query(Question).filter(Question.id == id, Question.user_id == current_user.id).first()
+        question.theme = form.theme.data
+        question.question = form.question.data
+        db_sess.commit()
+        return redirect("/account")
+    return render_template("questions.html", form=form, page_title=page_title)
+
+
+@app.route("/delete_question/<int:id>", methods=['GET', 'POST'])
+def delete_question(id):
+    db_sess = db_session.create_session()
+    question = db_sess.query(Question).filter(Question.id == id).first()
+    db_sess.delete(question)
     db_sess.commit()
     return redirect("/account")
 

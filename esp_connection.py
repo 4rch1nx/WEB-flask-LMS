@@ -9,10 +9,10 @@ def find_ESP():
     iface.scan()
     time.sleep(2)
     networks = iface.scan_results()
-    available_esp_nets = []
+    available_esp_nets = {}
     for net in networks:
         if "ESP8266_CAR" in net.ssid:
-            available_esp_nets.append(net)
+            available_esp_nets[net.id] = net
     if len(available_esp_nets) > 0:
         return available_esp_nets
     else:
@@ -41,6 +41,6 @@ def connect_to_wifi(ssid):
     if iface.status() == const.IFACE_CONNECTED:
         return True
     else:
-        return False
+        raise ConnectionError
 
 

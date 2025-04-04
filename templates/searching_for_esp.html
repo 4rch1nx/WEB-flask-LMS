@@ -8,7 +8,6 @@
   font-variation-settings:
     "wdth" 100;'> Поиск устройств... </h2>
 <br>
-<br>
 {% if available_esp == [] %}
     <div class="alert alert-danger" role="alert"> Не удалось найти устройства! Проверьте,
     включен ли ваш робот! В случае повторения ошибок <a href="/questions"> задайте вопрос</a> разработчикам.</div>
@@ -16,12 +15,20 @@
 <div class="container">
     <div class="row">
         <div class="col">
-            <h1> Найденные устройства: </h1>
+            <h3> Найденные устройства: </h3>
             {% for device in available_esp %}
-                <div class="col-md6 border rounded">
-                    <a> Ssid: </a> {{ device.ssid }}
+                <div class="col-md6 border rounded" style="height: 50">
+                    • <a style="font-weight: 600; font-style: italic"> Имя: </a> {{ device.ssid }}
+                    <br>
+                    • <a style="font-weight: 600; font-style: italic"> id: </a> {{ device.id }}
+                    <br>
+                    • <a style="font-weight: 600; font-style: italic"> Bssid: </a> {{ device.bssid }}
+                    <br>
+                    <br>
                     <a href="/connect_to_esp_ssid/{{device.ssid}}" class="btn btn-secondary"> Подключиться </a>
                     <a href="/save_device/{{device.ssid}}" class="btn btn-secondary"> Сохранить </a>
+                    <br>
+                    <br>
                 </div>
             {% endfor %}
             <hr>

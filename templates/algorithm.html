@@ -14,16 +14,20 @@
     <div class="row">
         <p style="font-weight: 500;"> Допустимые функции: </p>
         <p>
-        • <code> вперёд(время) </code> - движение робота прямо вперёд. В аргументах функции указывается время движения (в секундах).
+            • <code> вперёд(время) </code> - движение робота прямо вперёд. В аргументах функции указывается время
+            движения (в секундах).
         </p>
         <p>
-            • <code> назад(время) </code> - движение робота прямо назад. В аргументах функции указывается время движения (в секундах).
+            • <code> назад(время) </code> - движение робота прямо назад. В аргументах функции указывается время движения
+            (в секундах).
         </p>
         <p>
-            • <code> направо(время) </code> - поворот робота направо. В аргументах функции указывается время движения (в секундах).
+            • <code> направо(время) </code> - поворот робота направо. В аргументах функции указывается время движения (в
+            секундах).
         </p>
         <p>
-            • <code> налево(время) </code> - поворот робота налево. В аргументах функции указывается время движения (в секундах).
+            • <code> налево(время) </code> - поворот робота налево. В аргументах функции указывается время движения (в
+            секундах).
         </p>
     </div>
     <form action="" method="post">
@@ -35,17 +39,26 @@
                 <br>
                 <br>
                 <div class="mb-3">
-                    {{ form.turn_left_button(class="btn btn-primary", style="width: 90px; height: 90px;") }}
+                    <button type='button' class="btn btn-primary" style="width: 90px; height: 90px;"
+                            value="налево(1)" onclick="add_function(this.value)">
+                        Налево
+                    </button>
                 </div>
             </div>
             <div class="col-md-auto">
                 <div class="mb-3">
-                    {{ form.go_ahead_button(class="btn btn-primary", style="width: 90px; height: 90px;") }}
+                    <button type='button' class="btn btn-primary" style="width: 90px; height: 90px;"
+                            value="вперёд(10)" onclick="add_function(this.value)">
+                        Вперёд
+                    </button>
                 </div>
                 <img src="static/img/control_panel_logo.png" style="width: 90px; height: 90px;">
                 <br>
                 <div class="mb-3">
-                    {{ form.go_back_button(class="btn btn-primary", style="width: 90px; height: 90px;") }}
+                    <button type='button' class="btn btn-primary" style="width: 90px; height: 90px;"
+                            value="назад(10)" onclick="add_function(this.value)">
+                        Назад
+                    </button>
                 </div>
             </div>
             <div class="col-md-auto">
@@ -54,24 +67,22 @@
                 <br>
                 <br>
                 <div class="mb-3">
-                    {{ form.turn_right_button(class="btn btn-primary", style="width: 90px; height: 90px;") }}
+                    <button type='button' class="btn btn-primary" style="width: 90px; height: 90px;"
+                            value="направо(1)" onclick="add_function(this.value)">
+                        Направо
+                    </button>
                 </div>
             </div>
         </div>
         <div class="row">
-            <p>
-                {{ form.code_field.label }}
-                {{ form.code_field(class="form-control")}}<br>
-                {% for error in form.code_field.errors %}
-            <div class="alert alert-danger" role="alert">
-                {{ error }}
+            <div class="mb-3">
+                <label for="textarea_for_algorithm" class="form-label"> Алгоритм: </label>
+                <textarea class="form-control" id="textarea_for_algorithm" rows="3" name="textarea_for_algorithm"></textarea>
             </div>
-            {% endfor %}
-            </p>
         </div>
         <div class="row">
             {% if code_error_message %}
-                <div class="alert alert-danger" role="alert"> {{ code_error_message }}</div>
+            <div class="alert alert-danger" role="alert"> {{ code_error_message }}</div>
             {% endif %}
         </div>
         <div class="row">
@@ -87,7 +98,7 @@
     </form>
     <div class="row">
         {% if saving_error_message %}
-            <div class="alert alert-danger" role="alert"> {{ saving_error_message }}</div>
+        <div class="alert alert-danger" role="alert"> {{ saving_error_message }}</div>
         {% endif %}
     </div>
 </div>
@@ -95,16 +106,23 @@
 <br>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
+    function add_function(func){
+        var code = document.getElementById("textarea_for_algorithm").value;
+        if (code != "") {
+             code = code + "\n";
+        }
+        code = code + func;
+        document.getElementById("textarea_for_algorithm").value=code;
+    }
+</script>
+<script>
+    window.onbeforeunload = function () {
+        window.sessionStorage.setItem('last_algorithm', document.getElementById('textarea_for_algorithm').value);
+    }
 
-document.querySelectorAll('textarea, input').forEach(function(e) {
-    if(e.value === '') e.value = window.sessionStorage.getItem(e.name, e.value);
-    e.addEventListener('input', function() {
-        window.sessionStorage.setItem(e.name, e.value);
-    })
-})
-
-});
+    window.onload = function () {
+        document.getElementById('textarea_for_algorithm').value = window.sessionStorage.getItem('last_algorithm');
+    }
 </script>
 {% endfor %}
 {% endblock %}

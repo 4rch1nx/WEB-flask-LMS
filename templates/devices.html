@@ -26,10 +26,15 @@
                 {% if user_devices != [] %}
                     {% for device in user_devices %}
                         <div class="col-md6 border rounded">
-                            <a> Имя устройства: </a> {{ device.name }}
-                            <a> Ssid: </a> {{ device.ssid }}
-                            <a href="/connect_to_esp/{{device.id}}" class="btn btn-secondary"> Подключиться </a>
+                            • <a style="font-weight: 600; font-style: italic"> Имя устройства: </a> {{ device.name }}
+                            <br>
+                            • <a style="font-weight: 600; font-style: italic"> Ssid: </a> {{ device.ssid }}
+                            <br>
+                            <br>
+                            <a href="/connect_to_esp_ssid/{{device.ssid}}" class="btn btn-secondary"> Подключиться </a>
                             <a href="/about_device/{{device.id}}" class="btn btn-secondary"> Об устройстве  </a>
+                            <br>
+                            <br>
                         </div>
                     {% endfor %}
                 {% else %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% if successful %}
+    <div class="div-inline-block" style="font-size: 40px; font-weight: 400">
+        <i class="fa fa-check-circle fa-spin" aria-hidden="true" style="color: #22cf22"></i> {{ page_title }}
+    </div>
+{% else %}
+    <div class="div-inline-block" style="font-size: 40px; font-weight: 400">
+        <i class="fa fa-times-circle fa-spin" aria-hidden="true" style="color: #c42525"></i> {{ page_title }}
+    </div>
+{% endif %}
+<br>
+<div>
+    {{ message }}
+</div>
+<br>
+<a href="/main" class="btn btn-primary"> На главную </a>
+<br>
+<br>
+{% if other_button_message != "" %}
+<a href={{redirection}} class="btn btn-secondary"> {{ other_button_message }}</a>
+{% endif %}
+{% for i in range(20) %}
+<br>
+{% endfor %}
+{% endblock %}

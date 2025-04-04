@@ -79,6 +79,12 @@
                         <div class="col-md6 border rounded">
                             <h5> Тема: </h5> {{ question.theme }}
                             <h5> Вопрос: </h5> {{ question.question }}
+                            <br>
+                            <br>
+                            <p>
+                                <a href="/сhanging_question/{{question.id}}" class="btn btn-primary"> Изменить </a>
+                                <a href="/delete_question/{{question.id}}" class="btn btn-danger"> Удалить  </a>
+                            </p>
                         </div>
                     <br>
                     {% endfor %}
