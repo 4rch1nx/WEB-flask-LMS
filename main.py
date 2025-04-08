@@ -14,7 +14,6 @@ from data.saved_algorithms import Saved_algorithm
 
 from forms.authorization import RegisterForm, LoginForm, ProfileEditingForm
 from forms.questions import Question_form, Answer_Question_form, Changing_question_form
-from forms.algorithm_editor import Algorithm_form
 
 #импорт констант
 from constants import *
@@ -31,6 +30,22 @@ app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'  # секретный кл�
 login_manager = LoginManager()  #объект менеджера авторизации пользователей
 login_manager.init_app(app)
 
+
+# Доделать:
+# -------------------------------------------------------------------------
+# 1. Постараться подсветить функции в редакторе кода во вкладке "Алгоритм"
+# 2. Доделать систему сохранения алгоритма движения машинки:
+#     - Сделать окно с предупреждением о том, что алгоритм не сохранён. Окно должно появляться перед выходом
+#       со страницы алгоритм (информацию о сохранении / не сохранении алгоритма можно записывать в sessionStorage).
+#       Также, в окне должна быть галочка "Больше не показывать"/
+#
+#     - Сделать систему отображения и изменения названий алгоритмов.
+# 3. Сделать окно информации о сохранённом устройстве, а также о подключенном устройстве с возможностью
+# отключения от него (при отсутствии подключения перенаправлять на страницу '/devices', при подлкюченном
+# устройстве - на страницу с информацией о нён.
+# 4. В Modal, предупреждающем о подлкючении устройства через WiFi, сделать галочку "Не показывать больше"
+# 5. Дописать окна с теорией и документацией
+# 6. (В конце) Сделать шаблон для ошибок (404, 400 и др.)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -71,7 +86,8 @@ def register():
         user.set_password(form.password.data)
         db_sess.add(user)
         db_sess.commit()
-        return redirect('/login')
+        login_user(user, remember=False)
+        return redirect("/")
     return render_template('register.html', title='Регистрация', form=form, message="")
 
 
@@ -167,59 +183,7 @@ def control():
     return render_template("control.html", src_inpt="static/img/base_account_photo.jpg")
 
 
-# @app.route('/algorithm', methods=['GET', 'POST'])
-# def algorithm():
-#     """
-#     Функция рендеринга страницы, на которой находится система составления алгоритма
-#     движений машинки
-#     :return: algorithm.html
-#     :rtype: html
-#     """
-#     form = Algorithm_form()
-#     code_error_message = ""
-#     saving_error_message = ""
-#     if form.validate_on_submit():
-#         code = form.code_field.data
-#         if code != "" and not form.run_algorithm_button.data:
-#             code += "\n"
-#         if form.go_ahead_button.data:
-#             code += "вперёд(10)"
-#         elif form.go_back_button.data:
-#             code += "назад(10)"
-#         elif form.turn_right_button.data:
-#             code += "направо(1)"
-#         elif form.turn_left_button.data:
-#             code += "налево(1)"
-#         elif form.run_algorithm_button.data:
-#             if code != "":
-#                 functions = read_code(code)
-#                 if type(functions) == str:
-#                     code_error_message = functions
-#         elif form.save_algorithm_button.data:
-#             if current_user.is_authenticated:
-#                 if code != "":
-#                     error = find_errors_in_code(code)
-#                     if error is None:
-#                         db_sess = db_session.create_session()
-#                         saved_algorithm = Saved_algorithm(
-#                             algorithm=code,
-#                             user_id=current_user.id
-#                         )
-#                         db_sess.add(saved_algorithm)
-#                         db_sess.merge(current_user)
-#                         db_sess.commit()
-#                         return redirect('/successful_saving')
-#                     else:
-#                         saving_error_message = error
-#                 else:
-#                     saving_error_message = "Нельзя сохранять пустой код!"
-#             else:
-#                 saving_error_message = "Войдите в аккаунт / зарегистрируйтесь, чтобы сохранить ваш код!"
-#         form.code_field.data = code
-#     return render_template("algorithm.html", form=form, code_error_message=code_error_message,
-#                            saving_error_message=saving_error_message)
-
-@app.route('/algorithm', methods=['GET', 'POST'])
+@app.route('/algorithm')
 def algorithm():
     """
     Функция рендеринга страницы, на которой находится система составления алгоритма
@@ -227,38 +191,50 @@ def algorithm():
     :return: algorithm.html
     :rtype: html
     """
-    form = Algorithm_form()
-    code_error_message = ""
-    saving_error_message = ""
-    if form.validate_on_submit():
-        code = request.form["textarea_for_algorithm"]
-        if form.run_algorithm_button.data:
-            if code != "":
-                functions = read_code(code)
-                if type(functions) == str:
-                    code_error_message = functions
-        elif form.save_algorithm_button.data:
-            if current_user.is_authenticated:
-                if code != "":
-                    error = find_errors_in_code(code)
-                    if error is None:
-                        db_sess = db_session.create_session()
-                        saved_algorithm = Saved_algorithm(
-                            algorithm=code,
-                            user_id=current_user.id
-                        )
-                        db_sess.add(saved_algorithm)
-                        db_sess.merge(current_user)
-                        db_sess.commit()
-                        return redirect('/successful_saving')
-                    else:
-                        saving_error_message = error
-                else:
-                    saving_error_message = "Нельзя сохранять пустой код!"
-            else:
-                saving_error_message = "Войдите в аккаунт / зарегистрируйтесь, чтобы сохранить ваш код!"
+    code_error_message = request.args.get("code_error_message")
+    saving_error_message = request.args.get("saving_error_message")
+    if code_error_message is None: code_error_message = ""
+    if saving_error_message is None: saving_error_message = ""
     return render_template("algorithm.html", code_error_message=code_error_message,
-                           saving_error_message=saving_error_message, form=form)
+                           saving_error_message=saving_error_message)
+
+
+@app.route('/run_algorithm')
+def run_algorithm():
+    code = request.args.get("algorithm")
+    code_error_message = ""
+    if code != "":
+        functions = read_code(code)
+        if type(functions) == str:
+            code_error_message = functions
+    return redirect(f"/algorithm?code_error_message={code_error_message}")
+
+
+@app.route('/save_algorithm', methods=['GET', 'POST'])
+def save_algorithm():
+    code = request.args.get("algorithm")
+    saving_error_message = ""
+    if current_user.is_authenticated:
+        if code != "":
+            error = find_errors_in_code(code)
+            if error is None:
+                db_sess = db_session.create_session()
+                saved_algorithm = Saved_algorithm(
+                    algorithm=code,
+                    user_id=current_user.id
+                )
+                db_sess.add(saved_algorithm)
+                db_sess.merge(current_user)
+                db_sess.commit()
+                return redirect('/successful_saving')
+            else:
+                saving_error_message = error
+        else:
+            saving_error_message = "Нельзя сохранять пустой код!"
+    else:
+        saving_error_message = "Войдите в аккаунт / зарегистрируйтесь, чтобы сохранить ваш код!"
+
+    return redirect(f"/algorithm?saving_error_message={saving_error_message}")
 
 
 @app.route('/successful_saving')
@@ -270,10 +246,20 @@ def successful_saving():
     :rtype: html
     """
     return render_template("result_of_operation.html", page_title="Алгоритм сохранён!",
-                           message="",
+                           message="""Вы можете найти сохранённые вами алгоритмы, нажав на кнопку "Сохранённые алгоритмы"
+                           на странице "Алгоритм" или в вашем профиле.
+                           """,
                            other_button_message="Продолжить писать алгоритм",
                            redirection="/algorithm",
                            successful=True)
+
+@app.route('/saved_algorithms')
+def render_page_with_saved_algorithms():
+    db_sess = db_session.create_session()
+    algorithms = list(db_sess.query(Saved_algorithm).filter(Saved_algorithm.user_id == current_user.id))
+    return render_template("saved_algorithms.html", saved_algorithms=algorithms)
+
+
 
 
 @app.route('/theory')
@@ -309,7 +295,7 @@ def devices():
     user_devices = []
     if current_user.is_authenticated:
         db_sess = db_session.create_session()
-        user_devices = list(db_sess.query(Devices).filter(Devices.id == current_user.id))
+        user_devices = list(db_sess.query(Devices).filter(Devices.user_id == current_user.id))
     return render_template("devices.html", user_devices=user_devices)
 
 
@@ -352,14 +338,19 @@ def render_connection_error(ssid):
 @app.route('/save_device/<ssid>')
 def save_device(ssid):
     db_sess = db_session.create_session()
-    device = Devices(
-        name=ssid,
-        ssid=ssid
-    )
-    current_user.devices.append(device)
-    db_sess.merge(current_user)
-    db_sess.commit()
-    return redirect(f"/successful_device_saving/{ssid}")
+    saved_devices = list(db_sess.query(Devices).filter(Devices.ssid == ssid))
+    if not saved_devices:
+        device = Devices(
+            name=ssid,
+            ssid=ssid
+        )
+        current_user.devices.append(device)
+        db_sess.merge(current_user)
+        db_sess.commit()
+        return redirect(f"/successful_device_saving/{ssid}")
+    else:
+        return redirect(f"/devices")
+
 
 @app.route('/successful_device_saving/<ssid>')
 def render_successful_device_saving(ssid):
@@ -369,6 +360,15 @@ def render_successful_device_saving(ssid):
                            other_button_message="Мои устройства",
                            redirection=f"/devices",
                            successful=True)
+
+
+@app.route('/delete_device/<int:device_id>')
+def delete_device(device_id):
+    db_sess = db_session.create_session()
+    device = db_sess.query(Devices).filter(Devices.id == device_id).first()
+    db_sess.delete(device)
+    db_sess.commit()
+    return redirect('/devices')
 
 
 @app.route('/questions', methods=['GET', 'POST'])

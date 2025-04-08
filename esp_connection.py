@@ -27,12 +27,10 @@ def connect_to_wifi(ssid):
     profile.cipher = const.CIPHER_TYPE_CCMP
     profile.key = 12345678
 
-    # Удаляем возможные дубликаты профилей
     for i in iface.scan_results():
         if i.ssid == ssid:
             iface.remove_network_profile(i)
 
-    # Добавляем профиль и подключаемся
     tmp_profile = iface.add_network_profile(profile)
     iface.connect(tmp_profile)
     time.sleep(3)  # Даём время на подключение
@@ -42,5 +40,19 @@ def connect_to_wifi(ssid):
         return True
     else:
         raise ConnectionError
+
+def check_connection():
+    iface.scan()
+    networks = iface.scan_results()
+    current_network = None
+    for network in networks:
+        if network.ssid != '':
+            current_network = network
+            break
+    if "ESP8266_CAR" in current_network.ssid:
+        return True
+    else:
+        return False
+
 
 

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <h2 style='font-family: "Tektur", sans-serif;
+                  font-optical-sizing: auto;
+                  font-weight: <weight>;
+                  font-style: normal;
+                  font-variation-settings:
+                    "wdth" 100;'> Сохранённые алгоритмы: </h2>
+    </div>
+    {% if not current_user.is_authenticated %}
+        <div class="alert alert-danger" role="alert">Войдите в аккаунт / зарегистрируйтесь, чтобы
+            просмотреть сохранённые алгоритмы!
+        </div>
+    {% elif saved_algorithms == [] %}
+        <div class="alert alert-primary" role="alert" style="text-align: center;">
+            У вас нет сохранённых алгоритмов.
+        </div>
+    {% else %}
+    <div class="row">
+        <div class="accordion" id="Algorithm_accordion">
+            {% for algorithm in saved_algorithms %}
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#{{algorithm.id}}"
+                                aria-expanded="true" aria-controls="collapseOne">
+                             {{ loop.index }}. {{ algorithm.name }}
+                        </button>
+                    </h2>
+                    <div id="{{algorithm.id}}" class="accordion-collapse collapse" aria-labelledby="headingOne"
+                         data-bs-parent="#Algorithm_accordion">
+                        <div class="accordion-body">
+                            <p>
+                                {% for string in algorithm.algorithm.split(',') %}
+                                    <a style="opacity: 0.4;"> {{ loop.index }}. </a> {{ string }} <br>
+                                {% endfor %}
+                            </p>
+                            <button value="{{algorithm.algorithm | replace(',', '\n')}}" class="btn btn-primary"
+                                    onclick="open_algorithm(this.value)">
+                                Открыть
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+<script>
+    function open_algorithm(algorithm) {
+        window.sessionStorage.setItem('last_algorithm', algorithm);
+        window.location.href = "http://127.0.0.1:8080/algorithm"
+    }
+</script>
+{% for i in range(23) %}
+<br>
+{% endfor %}
+{% endblock %}

@@ -2,7 +2,7 @@ available_actions = ["вперёд", "назад", "направо", "налев
 
 
 def read_code(code):
-    list_of_functions = code.split('\r\n')
+    list_of_functions = code.split(',')
     functions = []
     for function in list_of_functions:
         if function != "":
@@ -44,7 +44,7 @@ def find_error_in_function(function):
 
 
 def find_errors_in_code(code):
-    list_of_functions = code.split('\r\n')
+    list_of_functions = code.split(',')
     for function in list_of_functions:
         if function != "":
             error = find_error_in_function(function)

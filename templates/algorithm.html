@@ -30,8 +30,10 @@
             секундах).
         </p>
     </div>
+    <a href="/saved_algorithms" class="btn btn-secondary"> Сохранённые алгоритмы </a>
+    <br>
+    <br>
     <form action="" method="post">
-        {{ form.hidden_tag() }}
         <div class="row">
             <div class="col-md-auto">
                 <br>
@@ -77,22 +79,26 @@
         <div class="row">
             <div class="mb-3">
                 <label for="textarea_for_algorithm" class="form-label"> Алгоритм: </label>
-                <textarea class="form-control" id="textarea_for_algorithm" rows="3" name="textarea_for_algorithm"></textarea>
+                <textarea class="CodeMirror" id="textarea_for_algorithm"></textarea>
             </div>
         </div>
         <div class="row">
-            {% if code_error_message %}
+            {% if code_error_message%}
             <div class="alert alert-danger" role="alert"> {{ code_error_message }}</div>
             {% endif %}
         </div>
         <div class="row">
             <div class="mb-3">
-                {{ form.run_algorithm_button(class="btn btn-primary") }}
+                <button type='button' class="btn btn-primary" onclick="run_algorithm()">
+                        Запустить
+                </button>
             </div>
         </div>
         <div class="row">
             <div class="mb-3">
-                {{ form.save_algorithm_button(class="btn btn-secondary") }}
+                <button type='button' class="btn btn-secondary" onclick="save_algorithm()">
+                        Сохранить алгоритм
+                </button>
             </div>
         </div>
     </form>
@@ -102,27 +108,52 @@
         {% endif %}
     </div>
 </div>
-{% for i in range(22) %}
-<br>
-
 <script>
-    function add_function(func){
-        var code = document.getElementById("textarea_for_algorithm").value;
-        if (code != "") {
-             code = code + "\n";
-        }
-        code = code + func;
-        document.getElementById("textarea_for_algorithm").value=code;
-    }
+    var editor = CodeMirror.fromTextArea(document.getElementById("textarea_for_algorithm"), {
+                    mode: "css",
+                    lineNumbers: true,
+                });
+
+
 </script>
 <script>
+    function add_function(func){
+        var code = editor.getValue();
+        if (code != "") {
+            code = code + "\n";
+        }
+        code = code + func;
+        editor.setValue(code);
+    }
+</script>
+
+<script>
     window.onbeforeunload = function () {
-        window.sessionStorage.setItem('last_algorithm', document.getElementById('textarea_for_algorithm').value);
+        window.sessionStorage.setItem('last_algorithm', editor.getValue());
     }
 
     window.onload = function () {
-        document.getElementById('textarea_for_algorithm').value = window.sessionStorage.getItem('last_algorithm');
+        editor.setValue(window.sessionStorage.getItem('last_algorithm'));
     }
 </script>
+
+<script>
+    function run_algorithm() {
+        let algorithm = editor.getValue().split("\n"); // event.preventDefault();
+        let encode_algorithm = encodeURIComponent(algorithm);
+        window.location.href = "http://127.0.0.1:8080/run_algorithm?algorithm=" + encode_algorithm;
+    }
+</script>
+
+<script>
+    function save_algorithm() {
+        let algorithm = editor.getValue().split('\n'); // event.preventDefault();
+        let encode_algorithm = encodeURIComponent(algorithm);
+        window.location.href = "http://127.0.0.1:8080/save_algorithm?algorithm=" + encode_algorithm;
+    }
+</script>
+
+{% for i in range(22) %}
+<br>
 {% endfor %}
 {% endblock %}

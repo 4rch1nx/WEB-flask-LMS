@@ -25,7 +25,7 @@
                     • <a style="font-weight: 600; font-style: italic"> Bssid: </a> {{ device.bssid }}
                     <br>
                     <br>
-                    <a href="/connect_to_esp_ssid/{{device.ssid}}" class="btn btn-secondary"> Подключиться </a>
+                    <a class="btn btn-secondary open-modal-btn" data-toggle="modal" data-target="#warning_modal" data-url="/connect_to_esp_ssid/{{device.ssid}}"> Подключиться </a>
                     <a href="/save_device/{{device.ssid}}" class="btn btn-secondary"> Сохранить </a>
                     <br>
                     <br>
@@ -42,6 +42,41 @@
 <br>
 <br>
 <a href="/devices" class="btn btn-danger"> Назад к моим устройствам </a>
+
+<div class="modal fade" id="warning_modal" tabindex="-1" aria-labelledby="warning_modal_label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="warning_modal_label">
+                    <i class="fa fa-exclamation-triangle" aria-hidden="true" style="color: #db0808;"> </i>
+                    <a> Внимание! </a>
+                </h5>
+            </div>
+            <div class="modal-body">
+                Наше приложение подключается к устройствам через WiFi! После подключения ваш компьютер будет отключен от
+                интернета! Вы хотите продолжить?
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="btn btn-danger" data-bs-dismiss="modal"> Отмена </a>
+                <a href="#" class="btn btn-primary" id="modalConfirmBtn"> Подключить</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).on('click', '.open-modal-btn', function(e) {
+    e.preventDefault();
+
+    var url = $(this).data('url');
+
+    $('#warning_modal').find('#modalConfirmBtn').attr('href', url);
+
+    $('#warning_modal').modal('show');
+});
+
+</script>
+
 {% for i in range(22) %}
     <br>
 {% endfor %}
