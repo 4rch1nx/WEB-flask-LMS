@@ -18,6 +18,7 @@ class User(SqlAlchemyBase, UserMixin):
                               index=True, unique=True, nullable=True)
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     src_avatar = sqlalchemy.Column(sqlalchemy.String, nullable=False, default=DEFAULT_PROFILE_PHOTO)
+    warning_message_when_connecting_to_esp = sqlalchemy.Column(sqlalchemy.String, nullable=False, default="true")
     saved_algorithms = orm.relationship("Saved_algorithm", back_populates='user')
     devices = orm.relationship("Devices", back_populates='user')
     questions = orm.relationship("Question", back_populates='user')

@@ -32,7 +32,8 @@
                 • <a style="font-weight: 600; font-style: italic"> Ssid: </a> {{ device.ssid }}
                 <br>
                 <br>
-                <a class="btn btn-secondary open-modal-btn" data-toggle="modal" data-target="#warning_modal" data-url="/connect_to_esp_ssid/{{device.ssid}}"> Подключиться </a>
+                <a class="btn btn-secondary open-modal-btn" data-toggle="modal" data-target="#warning_modal"
+                   data-url="/connect_to_esp_ssid/{{device.ssid}}" data-should_show="{{should_show}}"> Подключиться </a>
                 <a href="/about_device/{{device.id}}" class="btn btn-secondary"> Об устройстве </a>
                 <a href="/delete_device/{{device.id}}" class="btn btn-danger"> Забыть устройство </a>
                 <br>
@@ -59,27 +60,47 @@
                 </h5>
             </div>
             <div class="modal-body">
-                Наше приложение подключается к устройствам через WiFi! После подключения ваш компьютер будет отключен от
-                интернета! Вы хотите продолжить?
+                <p>
+                    Наше приложение подключается к устройствам через WiFi! После подключения ваш компьютер будет
+                    отключен от
+                    интернета! Вы хотите продолжить?
+                </p>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="showAgainCheckBox">
+                        <label class="form-check-label" for="showAgainCheckBox">
+                            Не показывать больше
+                        </label>
+                    </div>
             </div>
             <div class="modal-footer">
                 <a href="#" class="btn btn-danger" data-bs-dismiss="modal"> Отмена </a>
-                <a href="#" class="btn btn-primary" id="modalConfirmBtn"> Подключить</a>
+                <button class="btn btn-primary" onclick="redirect_to_esp_connection_page()">Подключить</button>
             </div>
         </div>
     </div>
 </div>
 <script>
+    var url = "";
     $(document).on('click', '.open-modal-btn', function(e) {
     e.preventDefault();
 
-    var url = $(this).data('url');
+    url = $(this).data('url');
+    var should_show = $(this).data('should_show');
 
-    $('#warning_modal').find('#modalConfirmBtn').attr('href', url);
-
-    $('#warning_modal').modal('show');
+    if (should_show == true) {
+        $('#warning_modal').modal('show');
+    }
+    else {
+        window.location.href = "http://127.0.0.1:8080" + url;
+    }
 });
+</script>
 
+<script>
+    function redirect_to_esp_connection_page() {
+        var should_show_again = document.getElementById("showAgainCheckBox").checked;
+        window.location.href = "http://127.0.0.1:8080" + url + "?show_again=" + should_show_again;
+    }
 </script>
 {% for i in range(22) %}
 <br>

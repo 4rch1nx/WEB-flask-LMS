@@ -37,10 +37,16 @@
                                     <a style="opacity: 0.4;"> {{ loop.index }}. </a> {{ string }} <br>
                                 {% endfor %}
                             </p>
-                            <button value="{{algorithm.algorithm | replace(',', '\n')}}" class="btn btn-primary"
-                                    onclick="open_algorithm(this.value)">
-                                Открыть
-                            </button>
+                            <a>
+                                <button data-algorithm="{{algorithm.algorithm | replace(',', '\n')}}"
+                                        data-name="{{algorithm.name}}"
+                                        class="btn btn-primary"
+                                        onclick="open_algorithm(this)">
+                                    Открыть
+                                </button>
+                                <a href="/delete_algorithm/{{algorithm.id}}" class="btn btn-danger">Удалить алгоритм</a>
+                            </a>
+
                         </div>
                     </div>
                 </div>
@@ -50,8 +56,11 @@
     {% endif %}
 </div>
 <script>
-    function open_algorithm(algorithm) {
+    function open_algorithm(element) {
+        let algorithm = element.getAttribute('data-algorithm');
+        let name = element.getAttribute('data-name');
         window.sessionStorage.setItem('last_algorithm', algorithm);
+        window.sessionStorage.setItem('last_algorithm_name', name);
         window.location.href = "http://127.0.0.1:8080/algorithm"
     }
 </script>

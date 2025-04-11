@@ -2,10 +2,11 @@
 import requests
 import base64
 from flask import Flask
-from flask import render_template, redirect, session, make_response, request, abort, url_for
+
+from flask import render_template, redirect, session, request, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 
-#импорт классов из других файлов
+# импорт классов из других файлов
 from data.users import User
 from data.devices import Devices
 from data import db_session
@@ -15,7 +16,7 @@ from data.saved_algorithms import Saved_algorithm
 from forms.authorization import RegisterForm, LoginForm, ProfileEditingForm
 from forms.questions import Question_form, Answer_Question_form, Changing_question_form
 
-#импорт констант
+# импорт констант
 from constants import *
 
 # импорт функций для работы с ESP
@@ -27,7 +28,7 @@ from code_reader import *
 app = Flask(__name__)  # объект приложения
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'  # секретный ключ для защиты от CSRF-атак
 
-login_manager = LoginManager()  #объект менеджера авторизации пользователей
+login_manager = LoginManager()  # объект менеджера авторизации пользователей
 login_manager.init_app(app)
 
 
@@ -37,7 +38,7 @@ login_manager.init_app(app)
 # 2. Доделать систему сохранения алгоритма движения машинки:
 #     - Сделать окно с предупреждением о том, что алгоритм не сохранён. Окно должно появляться перед выходом
 #       со страницы алгоритм (информацию о сохранении / не сохранении алгоритма можно записывать в sessionStorage).
-#       Также, в окне должна быть галочка "Больше не показывать"/
+#       Также, в окне должна быть галочка "Больше не показывать".
 #
 #     - Сделать систему отображения и изменения названий алгоритмов.
 # 3. Сделать окно информации о сохранённом устройстве, а также о подключенном устройстве с возможностью
@@ -137,8 +138,6 @@ def get_description():
     """
     with open("description.txt", 'r', encoding="utf-8") as description_file:
         description = description_file.readlines()
-        for i in description:
-            i = i.strip()
         return description
 
 
@@ -193,10 +192,15 @@ def algorithm():
     """
     code_error_message = request.args.get("code_error_message")
     saving_error_message = request.args.get("saving_error_message")
-    if code_error_message is None: code_error_message = ""
-    if saving_error_message is None: saving_error_message = ""
+
+    algorithm_name = make_algorithm_name()
+
+    if code_error_message is None:
+        code_error_message = ""
+    if saving_error_message is None:
+        saving_error_message = ""
     return render_template("algorithm.html", code_error_message=code_error_message,
-                           saving_error_message=saving_error_message)
+                           saving_error_message=saving_error_message, algorithm_name=algorithm_name)
 
 
 @app.route('/run_algorithm')
@@ -205,7 +209,7 @@ def run_algorithm():
     code_error_message = ""
     if code != "":
         functions = read_code(code)
-        if type(functions) == str:
+        if functions is str:
             code_error_message = functions
     return redirect(f"/algorithm?code_error_message={code_error_message}")
 
@@ -213,20 +217,33 @@ def run_algorithm():
 @app.route('/save_algorithm', methods=['GET', 'POST'])
 def save_algorithm():
     code = request.args.get("algorithm")
+    algorithm_name = request.args.get("algorithm_name")
     saving_error_message = ""
     if current_user.is_authenticated:
         if code != "":
             error = find_errors_in_code(code)
             if error is None:
-                db_sess = db_session.create_session()
-                saved_algorithm = Saved_algorithm(
-                    algorithm=code,
-                    user_id=current_user.id
-                )
-                db_sess.add(saved_algorithm)
-                db_sess.merge(current_user)
-                db_sess.commit()
-                return redirect('/successful_saving')
+                if algorithm_name != "":
+                    db_sess = db_session.create_session()
+                    saved_algorithm = db_sess.query(Saved_algorithm).filter(
+                        Saved_algorithm.name == algorithm_name).filter(Saved_algorithm.id == current_user.id).first()
+                    if saved_algorithm:
+                        saved_algorithm.algorithm = code
+                        saved_algorithm.name = algorithm_name
+                        db_sess.commit()
+                        return redirect('/successful_saving')
+                    else:
+                        algorithm_to_save = Saved_algorithm(
+                            algorithm=code,
+                            name=algorithm_name,
+                            user_id=current_user.id
+                        )
+                        db_sess.add(algorithm_to_save)
+                        db_sess.merge(current_user)
+                        db_sess.commit()
+                        return redirect('/successful_saving')
+                else:
+                    saving_error_message = "Перед сохранением укажите название алгоритма!"
             else:
                 saving_error_message = error
         else:
@@ -246,12 +263,13 @@ def successful_saving():
     :rtype: html
     """
     return render_template("result_of_operation.html", page_title="Алгоритм сохранён!",
-                           message="""Вы можете найти сохранённые вами алгоритмы, нажав на кнопку "Сохранённые алгоритмы"
-                           на странице "Алгоритм" или в вашем профиле.
+                           message="""Вы можете найти сохранённые вами алгоритмы, нажав на кнопку "
+                           Сохранённые алгоритмы" на странице "Алгоритм" или в вашем профиле.
                            """,
                            other_button_message="Продолжить писать алгоритм",
                            redirection="/algorithm",
                            successful=True)
+
 
 @app.route('/saved_algorithms')
 def render_page_with_saved_algorithms():
@@ -260,6 +278,21 @@ def render_page_with_saved_algorithms():
     return render_template("saved_algorithms.html", saved_algorithms=algorithms)
 
 
+@app.route('/delete_algorithm/<int:id>')
+def delete_algorithm(algorithm_id):
+    db_sess = db_session.create_session()
+    algorithm = db_sess.query(Saved_algorithm).filter(Saved_algorithm.id == algorithm_id).filter(
+        Saved_algorithm.user_id == current_user.id).first()
+    db_sess.delete(algorithm)
+    db_sess.commit()
+    return redirect('/saved_algorithms')
+
+
+@app.route('/make_new_algorithm_page')
+def make_new_algorithm_page():
+    algorithm_name = make_algorithm_name()
+    session['last_algorithm_name'] = algorithm_name
+    return redirect('/algorithm')
 
 
 @app.route('/theory')
@@ -293,10 +326,12 @@ def devices():
     :rtype: html
     """
     user_devices = []
+    should_show_again = True
     if current_user.is_authenticated:
         db_sess = db_session.create_session()
         user_devices = list(db_sess.query(Devices).filter(Devices.user_id == current_user.id))
-    return render_template("devices.html", user_devices=user_devices)
+        should_show_again = current_user.warning_message_when_connecting_to_esp
+    return render_template("devices.html", user_devices=user_devices, should_show=should_show_again)
 
 
 @app.route('/searching_for_esp', methods=['GET', 'POST'])
@@ -310,6 +345,15 @@ def searching_for_esp():
 
 @app.route('/connect_to_esp_ssid/<ssid>')
 def connect_to_esp_ssid(ssid):
+    show_again = request.args.get("show_again")
+    if show_again == "true":
+        show_again = "false"
+    else:
+        show_again = "true"
+    db_sess = db_session.create_session()
+    current_user.warning_message_when_connecting_to_esp = show_again
+    db_sess.merge(current_user)
+    db_sess.commit()
     try:
         connect_to_wifi(ssid)
         return redirect(f'/successful_connection/{ssid}')
@@ -338,13 +382,15 @@ def render_connection_error(ssid):
 @app.route('/save_device/<ssid>')
 def save_device(ssid):
     db_sess = db_session.create_session()
-    saved_devices = list(db_sess.query(Devices).filter(Devices.ssid == ssid))
+    saved_devices = list(db_sess.query(Devices).filter(Devices.ssid == ssid).filter(Devices.user_id == current_user.id))
+
     if not saved_devices:
         device = Devices(
             name=ssid,
-            ssid=ssid
+            ssid=ssid,
+            user_id=current_user.id
         )
-        current_user.devices.append(device)
+        db_sess.add(device)
         db_sess.merge(current_user)
         db_sess.commit()
         return redirect(f"/successful_device_saving/{ssid}")
@@ -535,10 +581,11 @@ def answer_question(id):
         db_sess.commit()
         return redirect('/admin_account')
     else:
-        #print(form)
+        # print(form)
         return render_template('answer_the_question_form.html', form=form, question=question.question)
 
 
 if __name__ == '__main__':
-    db_session.global_init("db/main.db")  #инициализация базы данных
-    app.run(debug=True, port=8080, host='0.0.0.0')  #запуск сервера
+    db_session.global_init("db/main.db")  # инициализация базы данных
+
+    app.run(debug=True, port=8080, host='0.0.0.0')  # запуск сервера
