@@ -31,7 +31,7 @@ void handleStatus() {
 }
 
 // Servo speed control (with argument)
-void handleServo() {
+void handleServoRight() {
   // Check if the request contains the "speed" argument
   if (server.hasArg("speed")) {
     String speedStr = server.arg("speed");  // Get the speed argument as a string
@@ -39,7 +39,27 @@ void handleServo() {
 
     // Validate the speed value (must be between 0 and 180)
     if (speed >= 0 && speed <= 180) {
-      sFL.write(speed);  // Set the servo position (angle)
+      sFR.write(speed);
+      sRR.write(speed);
+      server.send(200, "text/plain", "Servo set to " + String(speed));
+    } else {
+      server.send(400, "text/plain", "Invalid speed. Must be between 0 and 180.");
+    }
+  } else {
+    server.send(400, "text/plain", "Missing 'speed' argument.");
+  }
+}
+
+void handleServoLeft() {
+  // Check if the request contains the "speed" argument
+  if (server.hasArg("speed")) {
+    String speedStr = server.arg("speed");  // Get the speed argument as a string
+    int speed = speedStr.toInt();           // Convert to integer
+
+    // Validate the speed value (must be between 0 and 180)
+    if (speed >= 0 && speed <= 180) {
+      sFL.write(speed);
+      sRL.write(speed);
       server.send(200, "text/plain", "Servo set to " + String(speed));
     } else {
       server.send(400, "text/plain", "Invalid speed. Must be between 0 and 180.");
@@ -70,7 +90,8 @@ void setup() {
   // API routes
   server.on("/toggle", handleToggle);
   server.on("/status", handleStatus);
-  server.on("/servo", handleServo);
+  server.on("/servo_right", handleServoRight);
+  server.on("/servo_left", handleServoLeft);
 
   server.begin();
   Serial.println("HTTP server started");
