@@ -10,13 +10,13 @@ const int ledPin = D4;  // LED pin
 bool ledState = false;
 
 Servo sFL;
-const int sFL_pin = D5;
+const int sFL_pin = D7;
 Servo sFR;
-const int sFR_pin = D6;
+const int sFR_pin = D8;
 Servo sRL;
-const int sRL_pin = D7;
+const int sRL_pin = D6;
 Servo sRR;
-const int sRR_pin = D8;
+const int sRR_pin = D5;
 
 // Toggle LED state (inverted logic)
 void handleToggle() {
@@ -30,16 +30,60 @@ void handleStatus() {
   server.send(200, "text/plain", "CONNECTED");
 }
 
-// Servo speed control (with argument)
-void handleServoRight() {
-  // Check if the request contains the "speed" argument
+void handleServoFL() {
   if (server.hasArg("speed")) {
-    String speedStr = server.arg("speed");  // Get the speed argument as a string
-    int speed = speedStr.toInt();           // Convert to integer
+    String speedStr = server.arg("speed");
+    int speed = speedStr.toInt();
 
-    // Validate the speed value (must be between 0 and 180)
+    if (speed >= 0 && speed <= 180) {
+      sFL.write(speed);
+      server.send(200, "text/plain", "Servo set to " + String(speed));
+    } else {
+      server.send(400, "text/plain", "Invalid speed. Must be between 0 and 180.");
+    }
+  } else {
+    server.send(400, "text/plain", "Missing 'speed' argument.");
+  }
+}
+
+void handleServoFR() {
+  if (server.hasArg("speed")) {
+    String speedStr = server.arg("speed");
+    int speed = speedStr.toInt();
+
     if (speed >= 0 && speed <= 180) {
       sFR.write(speed);
+      server.send(200, "text/plain", "Servo set to " + String(speed));
+    } else {
+      server.send(400, "text/plain", "Invalid speed. Must be between 0 and 180.");
+    }
+  } else {
+    server.send(400, "text/plain", "Missing 'speed' argument.");
+  }
+}
+
+void handleServoRL() {
+  if (server.hasArg("speed")) {
+    String speedStr = server.arg("speed");
+    int speed = speedStr.toInt();
+
+    if (speed >= 0 && speed <= 180) {
+      sRL.write(speed);
+      server.send(200, "text/plain", "Servo set to " + String(speed));
+    } else {
+      server.send(400, "text/plain", "Invalid speed. Must be between 0 and 180.");
+    }
+  } else {
+    server.send(400, "text/plain", "Missing 'speed' argument.");
+  }
+}
+
+void handleServoRR() {
+  if (server.hasArg("speed")) {
+    String speedStr = server.arg("speed");
+    int speed = speedStr.toInt();
+
+    if (speed >= 0 && speed <= 180) {
       sRR.write(speed);
       server.send(200, "text/plain", "Servo set to " + String(speed));
     } else {
@@ -50,24 +94,6 @@ void handleServoRight() {
   }
 }
 
-void handleServoLeft() {
-  // Check if the request contains the "speed" argument
-  if (server.hasArg("speed")) {
-    String speedStr = server.arg("speed");  // Get the speed argument as a string
-    int speed = speedStr.toInt();           // Convert to integer
-
-    // Validate the speed value (must be between 0 and 180)
-    if (speed >= 0 && speed <= 180) {
-      sFL.write(speed);
-      sRL.write(speed);
-      server.send(200, "text/plain", "Servo set to " + String(speed));
-    } else {
-      server.send(400, "text/plain", "Invalid speed. Must be between 0 and 180.");
-    }
-  } else {
-    server.send(400, "text/plain", "Missing 'speed' argument.");
-  }
-}
 
 void setup() {
   Serial.begin(115200);
@@ -90,8 +116,10 @@ void setup() {
   // API routes
   server.on("/toggle", handleToggle);
   server.on("/status", handleStatus);
-  server.on("/servo_right", handleServoRight);
-  server.on("/servo_left", handleServoLeft);
+  server.on("/servo_fl", handleServoFL);
+  server.on("/servo_fr", handleServoFR);
+  server.on("/servo_rl", handleServoRL);
+  server.on("/servo_rr", handleServoRR);
 
   server.begin();
   Serial.println("HTTP server started");
