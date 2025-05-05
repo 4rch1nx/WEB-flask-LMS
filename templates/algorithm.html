@@ -121,13 +121,48 @@
         </div>
     </div>
 </div>
+<style>
+    .cm-s-pseudotheme { color: #777777; } /* остальной текст (обычный символ) */
+    .cm-s-pseudotheme .cm-keyword { color: #3c7dea; font-weight: bold; } /* функции */
+    .cm-s-pseudotheme .cm-number { color: #45e300; } /* числа */
+    .cm-s-pseudotheme .cm-operator { color: #646dce; } /* операторы +,-,/,* */
+    .cm-s-pseudotheme .cm-comment { color: #b4b4b4; font-style: italic; } /* комменты */
+</style>
 <script>
-    var editor = CodeMirror.fromTextArea(document.getElementById("textarea_for_algorithm"), {
-                    mode: "css",
-                    lineNumbers: true,
-                });
+    CodeMirror.defineMode("pseudocode", function() {
+      const keywords = ["вперед", "вперёд", "направо", "налево", "назад"]; // хоть "вперёд" и передаётся в виде слова ключа для подсветки, оно не срабатывает, так как "ё" - неизвестный символ
+      return {
+        token: function(stream) {
+          if (stream.eatSpace()) return null;
 
+          if (stream.match(/^\/\/.*/, true) || stream.match(/^#.*/, true)) return "comment"; // комменты
+          const word = stream.match(/^[а-яА-Яa-zA-Z_][а-яА-Яa-zA-Z0-9_]*/, true); // слова
+          if (word) {
+            if (keywords.includes(word[0])) return "keyword"; // ключевые слова
+            return null; // иначе обычные слова (обычные символы)
+          }
 
+          if (stream.match(/^[0-9]+/, true)) return "number"; // числа
+
+          if (stream.match(/^[+\-*/=<>]/, true)) { // операторы
+            const next = stream.peek();
+            const prev = stream.string.charAt(stream.start - 2);
+            if (!next || /\s|[\(\)\[\],;]/.test(next) || /^[0-9]+/.test(prev) || /^[0-9]+/.test(next)) { return "operator"; }
+            stream.backUp(1);
+          }
+
+          stream.next(); // переходим к след символу
+          return null; // иначе, это просто текст (обычный символ)
+        }
+      };
+    });
+
+    var editor = CodeMirror.fromTextArea(document.getElementById("textarea_for_algorithm"), { // Создаём CodeMirror под textarea
+      mode: "pseudocode", // Мой синтаксис
+      theme: "pseudotheme", // Моя тема
+        // Можешь попробовать использовать другие темы, например встроенную тему default
+      lineNumbers: true
+    });
 </script>
 <script>
     function add_function(func){

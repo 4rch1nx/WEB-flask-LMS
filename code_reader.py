@@ -22,6 +22,8 @@ def find_error_in_function(func):
     function = delete_comments(func)
     function = function.replace(" ", "")
     function = function.replace("\n", "")
+    if function == "":
+        return None
     if (function.startswith("вперёд(") or function.startswith("назад(") or
         function.startswith("налево(") or function.startswith("направо(")) and function.endswith(")"):
         time = function[function.find("(") + 1:-1]

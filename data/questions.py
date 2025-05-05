@@ -1,10 +1,11 @@
 import sqlalchemy
 from sqlalchemy import orm
+from sqlalchemy_serializer import SerializerMixin
 
 from .db_session import SqlAlchemyBase
 
 
-class Question(SqlAlchemyBase):
+class Question(SqlAlchemyBase, SerializerMixin):
     __tablename__ = 'questions'
 
     id = sqlalchemy.Column(sqlalchemy.Integer,
@@ -17,7 +18,8 @@ class Question(SqlAlchemyBase):
     user = orm.relationship('User')
     answers = orm.relationship("Answer", back_populates='questions')
 
-class Answer(SqlAlchemyBase):
+
+class Answer(SqlAlchemyBase, SerializerMixin):
     __tablename__ = 'answers'
 
     id = sqlalchemy.Column(sqlalchemy.Integer,
@@ -26,5 +28,5 @@ class Answer(SqlAlchemyBase):
     question = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     answer = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     question_id = sqlalchemy.Column(sqlalchemy.Integer,
-                                sqlalchemy.ForeignKey("questions.id"))
+                                    sqlalchemy.ForeignKey("questions.id"))
     questions = orm.relationship('Question')

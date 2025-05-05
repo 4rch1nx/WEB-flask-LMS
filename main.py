@@ -6,6 +6,8 @@ from flask import Flask
 from flask import render_template, redirect, session, request, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 
+from flask_restful import reqparse, abort, Api, Resource
+
 # импорт классов из других файлов
 from data.users import User
 from data.devices import Devices
@@ -25,7 +27,10 @@ from esp_connection import *
 # импорт функций для обработки алгоритма движения робота
 from code_reader import *
 
+from api.questions_resources import *
+
 app = Flask(__name__)  # объект приложения
+api = Api(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'  # секретный ключ для защиты от CSRF-атак
 
 login_manager = LoginManager()  # объект менеджера авторизации пользователей
@@ -85,6 +90,7 @@ def register():
             email=form.email.data,
         )
         user.set_password(form.password.data)
+        user.set_api_key()
         db_sess.add(user)
         db_sess.commit()
         login_user(user, remember=False)
@@ -209,7 +215,7 @@ def run_algorithm():
     code_error_message = ""
     if code != "":
         functions = read_code(code)
-        if functions is str:
+        if type(functions) != str:
             code_error_message = functions
     return redirect(f"/algorithm?code_error_message={code_error_message}")
 
@@ -278,7 +284,7 @@ def render_page_with_saved_algorithms():
     return render_template("saved_algorithms.html", saved_algorithms=algorithms)
 
 
-@app.route('/delete_algorithm/<int:id>')
+@app.route('/delete_algorithm/<int:algorithm_id>')
 def delete_algorithm(algorithm_id):
     db_sess = db_session.create_session()
     algorithm = db_sess.query(Saved_algorithm).filter(Saved_algorithm.id == algorithm_id).filter(
@@ -351,8 +357,9 @@ def connect_to_esp_ssid(ssid):
     else:
         show_again = "true"
     db_sess = db_session.create_session()
-    current_user.warning_message_when_connecting_to_esp = show_again
-    db_sess.merge(current_user)
+    user = db_sess.query(User).filter(User.id == current_user.id).first()
+    user.warning_message_when_connecting_to_esp = show_again
+    db_sess.merge(user)
     db_sess.commit()
     try:
         connect_to_wifi(ssid)
@@ -479,7 +486,7 @@ def account():
         if users:
             form.name.data = users.name
             form.email.data = users.email
-            form.password.data = ''
+            form.password.data = ""
         db_answer = db_sess.query(Question).filter(Question.user_id == users.id)
         for q in db_answer:
             questions.append(q)
@@ -510,7 +517,7 @@ def account():
         return redirect("/account")
 
     return render_template('account.html', form=form, questions=questions,
-                           answers=answers, message="", input_src=current_user.src_avatar)
+                           answers=answers, message="", input_src=current_user.src_avatar, api_key=current_user.api_key)
 
 
 @app.route("/delete_photo")
@@ -581,11 +588,11 @@ def answer_question(id):
         db_sess.commit()
         return redirect('/admin_account')
     else:
-        # print(form)
         return render_template('answer_the_question_form.html', form=form, question=question.question)
 
 
 if __name__ == '__main__':
     db_session.global_init("db/main.db")  # инициализация базы данных
-
+    #api.add_resource(QuestionsListResource, '/api/questions')
+    api.add_resource(QuestionsResource, '/api/single')
     app.run(debug=True, port=8080, host='0.0.0.0')  # запуск сервера

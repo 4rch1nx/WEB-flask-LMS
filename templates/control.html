@@ -79,7 +79,7 @@
     <br>
     <div class="row">
         <div class="slider col">
-            <input type="range" min="-100" max="100" step="1" value="" id="sss_left">
+            <input type="range" min="-100" max="100" step="1" value="" id="left_range">
             <div class="val" id="value_left">0</div>
         </div>
         <div class="col-md-auto" style="text-align: center;">
@@ -92,17 +92,17 @@
             <p> Изображение с камеры:</p>
         </div>
         <div class="slider col">
-            <input type="range" min="-100" max="100" step="1" value="" id="sss_right">
+            <input type="range" min="-100" max="100" step="1" value="" id="right_range">
             <div class="val" id="value_right">0</div>
         </div>
     </div>
 </div>
 
 <script>
-    var left_slider = document.getElementById("sss_left");
+    var left_slider = document.getElementById("left_range");
     var left_slider_result = document.getElementById("value_left");
 
-    var right_slider = document.getElementById("sss_right");
+    var right_slider = document.getElementById("right_range");
     var right_slider_result = document.getElementById("value_right");
 
     function updateValues() {
@@ -114,6 +114,10 @@
     right_slider.addEventListener('input', updateValues);
 
     updateValues();
+</script>
+
+<script>
+
 </script>
 
 {% for i in range(20) %}

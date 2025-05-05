@@ -1,6 +1,25 @@
 {% extends "base.html" %}
 
 {% block content %}
+<script>
+    function change_api_key_showing_mode() {
+        let api_key_textarea = document.getElementById("api_key");
+        if (api_key_textarea.value.includes('•')) {
+            api_key_textarea.value = api_key_textarea.getAttribute("data-apikey");
+            document.getElementById("is_api_key_showing_icon").className = "fa fa-eye";
+        }
+        else {
+            console.log("Я тут!")
+            let hidden_api_key = "";
+            let api_key = api_key_textarea.value;
+            for (let i = 0; i < api_key.length; i++) {
+                hidden_api_key += '•';
+            }
+            api_key_textarea.value = hidden_api_key;
+            document.getElementById("is_api_key_showing_icon").className = "fa fa-eye-slash";
+        }
+    }
+</script>
 <div class="container">
     <div class="row">
         <div class="col-md-auto">
@@ -56,10 +75,27 @@
                 <div class="mb-3">
                     {{ form.password.label(class="form-label") }}
                     {{ form.password(class="form-control", type="password") }}
+                    <div id="passwordHelpBlock" class="form-text">
+                        Ваш пароль скрыт, но вы можете изменить его, вписав новый пароль в данное поле и нажав кнопку "Сохранить"
+                    </div>
                     {% for error in form.password.errors %}
                     <p class="alert alert-danger" role="alert">{{ error }}</p>
                     {% endfor %}
                 </div>
+
+                <div class="mb-3">
+                    <p> Ключ API: </p>
+                    <div class="input-group">
+                        <button class="btn btn-light" type="button" id="SeeApiKeyButton" onclick="change_api_key_showing_mode()">
+                            <i class="fa fa-eye" aria-hidden="true" id="is_api_key_showing_icon"></i>
+                        </button>
+                        <textarea readonly id="api_key" class="form-control"
+                                  style="resize: none; height: 40px;"
+                                  data-apikey="{{api_key}}">{{api_key}}</textarea>
+                        <script> change_api_key_showing_mode(); </script>
+                    </div>
+                </div>
+                <br>
 
                 <a href="/devices" class="btn btn-light"> К моим устройствам </a>
                 <br>
@@ -108,6 +144,7 @@
         </div>
     </div>
 </div>
+
 {% for i in range(3) %}
     <br>
 {% endfor %}
