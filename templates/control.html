@@ -79,20 +79,20 @@
     <br>
     <div class="row">
         <div class="slider col">
-            <input type="range" min="-100" max="100" step="1" value="" id="left_range">
+            <input type="range" min="0" max="180" step="1" value="90" id="left_range" oninput="send_motors_speeds_to_ESP(0)">
             <div class="val" id="value_left">0</div>
         </div>
         <div class="col-md-auto" style="text-align: center;">
             <a href="/control/start" class="btn btn-primary" style="width: 200px; height: 40px;"> Старт </a>
             <br>
             <br>
-            <a href="/control" class="btn btn-primary" style="width: 200px; height: 40px;"> Стоп </a>
+            <a href="/control" class="btn btn-primary" style="width: 200px; height: 40px;" onclick="stop()"> Стоп </a>
             <br>
             <br>
             <p> Изображение с камеры:</p>
         </div>
         <div class="slider col">
-            <input type="range" min="-100" max="100" step="1" value="" id="right_range">
+            <input type="range" min="0" max="180" step="1" value="90" id="right_range" oninput="send_motors_speeds_to_ESP(1)">
             <div class="val" id="value_right">0</div>
         </div>
     </div>
@@ -115,9 +115,44 @@
 
     updateValues();
 </script>
+<script>
+    function set_motor_speed(motor, motor_speed) {
+        $.ajax({
+            type: "GET",
+            url: "http://192.168.4.1/servo_" + motor,
+            data: {
+                'speed': motor_speed,
+            },
+            success: function(response) {
+                console.log(response);
+
+            },
+            error: function(response) {
+                console.log(response);
+            }
+        });
+    }
+</script>
+<script>
+    function send_motors_speeds_to_ESP(motors) {
+        if (motors == 0){
+            set_motor_speed('fl', left_slider.value);
+            set_motor_speed('rl', left_slider.value);
+        }
+        else {
+            set_motor_speed('fr', 180 - right_slider.value);
+            set_motor_speed('rr', 180 - right_slider.value);
+        }
+    }
+</script>
 
 <script>
-
+    function stop() {
+            set_motor_speed('fl', 90);
+            set_motor_speed('rl', 90);
+            set_motor_speed('fr', 90);
+            set_motor_speed('rr', 90);
+    }
 </script>
 
 {% for i in range(20) %}

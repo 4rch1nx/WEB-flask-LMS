@@ -3,29 +3,24 @@ import requests
 import base64
 from flask import Flask
 
-from flask import render_template, redirect, session, request, abort
+from flask import render_template, redirect, session, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 
-from flask_restful import reqparse, abort, Api, Resource
+from flask_restful import Api
 
 # импорт классов из других файлов
-from data.users import User
-from data.devices import Devices
-from data import db_session
-from data.questions import Question, Answer
-from data.saved_algorithms import Saved_algorithm
 
 from forms.authorization import RegisterForm, LoginForm, ProfileEditingForm
 from forms.questions import Question_form, Answer_Question_form, Changing_question_form
 
 # импорт констант
-from constants import *
+from Other.constants import *
 
 # импорт функций для работы с ESP
-from esp_connection import *
+from ESP.connection.esp_connection import *
 
 # импорт функций для обработки алгоритма движения робота
-from code_reader import *
+from Other.code_reader import *
 
 from api.questions_resources import *
 
@@ -142,7 +137,7 @@ def get_description():
     :rtype: list
     Возвращает описание в виде списка строк
     """
-    with open("description.txt", 'r', encoding="utf-8") as description_file:
+    with open("Other/description.txt", 'r', encoding="utf-8") as description_file:
         description = description_file.readlines()
         return description
 
@@ -589,6 +584,7 @@ def answer_question(id):
         return redirect('/admin_account')
     else:
         return render_template('answer_the_question_form.html', form=form, question=question.question)
+
 
 
 if __name__ == '__main__':

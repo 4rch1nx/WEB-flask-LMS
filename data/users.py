@@ -7,9 +7,9 @@ from flask_login import UserMixin
 
 
 from .db_session import SqlAlchemyBase
-from constants import DEFAULT_PROFILE_PHOTO
+from Other.constants import DEFAULT_PROFILE_PHOTO
 
-from api_key_generator import *
+from api.api_key_generator import *
 
 class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     __tablename__ = 'users'
