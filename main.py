@@ -1,7 +1,7 @@
 # импорт необходимых модулей
 import requests
 import base64
-from flask import Flask
+from flask import Flask, request
 
 from flask import render_template, redirect, session, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
@@ -13,16 +13,26 @@ from flask_restful import Api
 from forms.authorization import RegisterForm, LoginForm, ProfileEditingForm
 from forms.questions import Question_form, Answer_Question_form, Changing_question_form
 
+from data.users import User
+from data.questions import Question, Answer
+from data.saved_algorithms import Saved_algorithm
+from data.devices import Devices
+
 # импорт констант
 from Other.constants import *
 
 # импорт функций для работы с ESP
 from ESP.connection.esp_connection import *
+from ESP.control.esp_control import *
 
 # импорт функций для обработки алгоритма движения робота
 from Other.code_reader import *
 
+# импорт функций для API
 from api.questions_resources import *
+from api.answers_resources import *
+from api.saved_algorithms_resources import *
+from api.devices_resources import *
 
 app = Flask(__name__)  # объект приложения
 api = Api(app)
@@ -88,7 +98,7 @@ def register():
         user.set_api_key()
         db_sess.add(user)
         db_sess.commit()
-        login_user(user, remember=False)
+        login_user(user, remember=True)
         return redirect("/")
     return render_template('register.html', title='Регистрация', form=form, message="")
 
@@ -209,9 +219,9 @@ def run_algorithm():
     code = request.args.get("algorithm")
     code_error_message = ""
     if code != "":
-        functions = read_code(code)
-        if type(functions) != str:
-            code_error_message = functions
+        error = send_algorithm(code)
+        if isinstance(error, str):
+            code_error_message = error
     return redirect(f"/algorithm?code_error_message={code_error_message}")
 
 
@@ -381,23 +391,40 @@ def render_connection_error(ssid):
                            successful=False)
 
 
-@app.route('/save_device/<ssid>')
-def save_device(ssid):
+@app.route('/save_device')
+def save_device():
+    args = request.args
     db_sess = db_session.create_session()
-    saved_devices = list(db_sess.query(Devices).filter(Devices.ssid == ssid).filter(Devices.user_id == current_user.id))
+    saved_devices = list(db_sess.query(Devices).filter(Devices.user_id == current_user.id).filter(Devices.ssid == args["ssid"]))
 
     if not saved_devices:
         device = Devices(
-            name=ssid,
-            ssid=ssid,
+            name=args["ssid"],
+            ssid=args["ssid"],
+            bssid=args["bssid"],
             user_id=current_user.id
         )
         db_sess.add(device)
         db_sess.merge(current_user)
         db_sess.commit()
-        return redirect(f"/successful_device_saving/{ssid}")
+        return redirect(f"/successful_device_saving/{args['ssid']}")
     else:
         return redirect(f"/devices")
+
+
+@app.route('/about_device/<device_id>')
+def render_about_device_page(device_id):
+    db_sess = db_session.create_session()
+    device = db_sess.query(Devices).filter(Devices.user_id == current_user.id).filter(Devices.id == device_id).first()
+    return render_template('about_device_page.html', device=device)
+@app.route('/change_device_name')
+def change_device_name():
+    db_sess = db_session.create_session()
+    device = db_sess.query(Devices).filter(Devices.user_id == current_user.id).filter(Devices.id == request.args.get("device_id")).first()
+    device.name = request.args.get("new_name")
+    db_sess.merge(current_user)
+    db_sess.commit()
+    return redirect('/devices')
 
 
 @app.route('/successful_device_saving/<ssid>')
@@ -576,7 +603,8 @@ def answer_question(id):
             question_theme=question.theme,
             question=question.question,
             answer=form.answer.data,
-            question_id=id
+            question_id=id,
+            user_id=question.user_id
         )
         question.is_answered = True
         db_sess.add(answer)
@@ -586,9 +614,26 @@ def answer_question(id):
         return render_template('answer_the_question_form.html', form=form, question=question.question)
 
 
+@app.route('/api')
+def render_api_page_template():
+    return render_template("api_documentation.html")
+
+
+def add_resources_to_api():
+    api.add_resource(QuestionsListResource, '/api/questions')
+    api.add_resource(QuestionsResource, '/api/questions/single')
+
+    api.add_resource(AnswersListResource, '/api/answers')
+    api.add_resource(AnswersResource, '/api/answers/single')
+
+    api.add_resource(SavedAlgorithmsListResource, '/api/saved_algorithms')
+    api.add_resource(SavedAlgorithmsResource, '/api/saved_algorithms/single')
+
+    api.add_resource(SavedDevicesListResource, '/api/saved_devices')
+    api.add_resource(SavedDevicesResource, '/api/saved_devices/single')
+
 
 if __name__ == '__main__':
     db_session.global_init("db/main.db")  # инициализация базы данных
-    #api.add_resource(QuestionsListResource, '/api/questions')
-    api.add_resource(QuestionsResource, '/api/single')
+    add_resources_to_api()
     app.run(debug=True, port=8080, host='0.0.0.0')  # запуск сервера

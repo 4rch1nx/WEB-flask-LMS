@@ -12,6 +12,7 @@ class Devices(SqlAlchemyBase, SerializerMixin):
                            primary_key=True, autoincrement=True)
     name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     ssid = sqlalchemy.Column(sqlalchemy.String, nullable=False)
+    bssid = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     user_id = sqlalchemy.Column(sqlalchemy.Integer,
                                 sqlalchemy.ForeignKey("users.id"))
     user = orm.relationship('User')

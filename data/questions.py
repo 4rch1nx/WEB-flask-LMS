@@ -29,4 +29,7 @@ class Answer(SqlAlchemyBase, SerializerMixin):
     answer = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     question_id = sqlalchemy.Column(sqlalchemy.Integer,
                                     sqlalchemy.ForeignKey("questions.id"))
+    user_id = sqlalchemy.Column(sqlalchemy.Integer,
+                                sqlalchemy.ForeignKey("users.id"))
     questions = orm.relationship('Question')
+    user = orm.relationship('User')

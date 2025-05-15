@@ -1,6 +1,6 @@
 import datetime
 
-available_actions = ["вперёд", "назад", "направо", "налево"]
+available_actions = ["вперед", "назад", "направо", "налево"]
 
 
 def read_code(code):
@@ -24,7 +24,7 @@ def find_error_in_function(func):
     function = function.replace("\n", "")
     if function == "":
         return None
-    if (function.startswith("вперёд(") or function.startswith("назад(") or
+    if (function.startswith("вперед(") or function.startswith("назад(") or
         function.startswith("налево(") or function.startswith("направо(")) and function.endswith(")"):
         time = function[function.find("(") + 1:-1]
         if not time.isdigit():
@@ -32,15 +32,15 @@ def find_error_in_function(func):
         else:
             return None
     else:
-        if (function.startswith("вперёд(") or function.startswith("назад(") or
+        if (function.startswith("вперед(") or function.startswith("назад(") or
             function.startswith("налево(") or function.startswith("направо(")) and ")" not in function:
             return f"Ошибка! В команде '{func}' отсутствует закрывающаяся скобка ')'"
 
-        elif (function.startswith("вперёд(") or function.startswith("назад(") or
+        elif (function.startswith("вперед(") or function.startswith("назад(") or
               function.startswith("налево(") or function.startswith("направо(")) and not function.endswith(")"):
             return f"Ошибка в строке '{func}'! В каждой строке должна быть только функция и её аргумент!"
 
-        elif (not function.startswith("вперёд(") and not function.startswith("назад(") and
+        elif (not function.startswith("вперед(") and not function.startswith("назад(") and
               not function.startswith("налево(") and not function.startswith("направо(")):
             return f"Ошибка! Недопустимая команда: '{func}'"
 

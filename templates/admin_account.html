@@ -21,12 +21,14 @@
             <h2> Вопросы пользователей </h2>
             {% if questions %}
                 {% for question in questions %}
-                            <div class="col-md6 border rounded">
+                            <div class="col-md6 border rounded" style="padding-left: 5px; margin-top: 2px; margin-bottom: 5px;">
                                 <h5> Тема: </h5> {{ question.theme }}
                                 <h5> Вопрос: </h5> {{ question.question }}
                                 <br>
                                 <br>
                                 <a href="/answer_question/{{ question.id }}" class="btn btn-primary"> Ответить </a>
+                                <br>
+                                <br>
                             </div>
                         <br>
                         {% endfor %}

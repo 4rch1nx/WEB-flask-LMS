@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <p style="font-family: Tektur, sans-serif;
+                  font-optical-sizing: auto;
+                  font-weight: 600;
+                  font-size: 40px;
+                  font-style: normal;">Об устройстве</p>
+    </div>
+    <div class="row" style="background: linear-gradient(45deg, #fdfdfd, #e2effc); padding-left: 10px; margin-top: 10px; border-radius: 5px;">
+        <br>
+        <div class="container">
+            <div class="row g-3 align-items-center">
+                <div class="col-auto">
+                    <label for="device_name" class="col-form-label"> • <em> Имя: </em> </label>
+                </div>
+                <div class="col-auto">
+                    <textarea id="device_name" class="form-control"
+                          style="resize: none; height: 40px;"> {{device.name}}</textarea>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md6">
+                    <br>
+                    <a> • <em> Ssid: </em> {{device.ssid}}</a>
+                    <br>
+                    <br>
+                    <a> • <em> Bssid: </em> {{device.bssid}}</a>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col">
+                    <button class="btn btn-primary" onclick="change_device_name('{{device.id}}')" style="width: fit-content;">Сохранить изменения </button>
+                    <br>
+                    <br>
+                    <a class="btn btn-secondary" href="/devices" style="width: fit-content;">К моим устройствам </a>
+                    <br>
+                    <br>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function change_device_name(device_id) {
+        new_name = document.getElementById("device_name").value;
+        window.location.href = "http://127.0.0.1:8080/change_device_name?device_id=" + device_id + "&new_name=" + new_name;
+    }
+</script>
+{% for i in range(22) %}
+<br>
+{% endfor %}
+{% endblock %}

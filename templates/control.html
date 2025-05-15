@@ -136,12 +136,12 @@
 <script>
     function send_motors_speeds_to_ESP(motors) {
         if (motors == 0){
-            set_motor_speed('fl', left_slider.value);
-            set_motor_speed('rl', left_slider.value);
+            set_motor_speed('l', left_slider.value);
+            //set_motor_speed('rl', left_slider.value);
         }
         else {
-            set_motor_speed('fr', 180 - right_slider.value);
-            set_motor_speed('rr', 180 - right_slider.value);
+            set_motor_speed('r', 180 - right_slider.value);
+            //set_motor_speed('rr', 180 - right_slider.value);
         }
     }
 </script>

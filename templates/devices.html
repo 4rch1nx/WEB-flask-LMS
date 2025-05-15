@@ -26,10 +26,8 @@
         <div class="col">
             {% if user_devices != [] %}
             {% for device in user_devices %}
-            <div class="col-md6 border rounded">
-                • <a style="font-weight: 600; font-style: italic"> Имя устройства: </a> {{ device.name }}
-                <br>
-                • <a style="font-weight: 600; font-style: italic"> Ssid: </a> {{ device.ssid }}
+            <div class="col-md6 border rounded" style="padding-left: 15px; margin-top: 15px;">
+                • <a style="font-weight: 400; font-style: italic; font-size: 25px;"> {{ device.name }} </a>
                 <br>
                 <br>
                 <a class="btn btn-secondary open-modal-btn" data-toggle="modal" data-target="#warning_modal"

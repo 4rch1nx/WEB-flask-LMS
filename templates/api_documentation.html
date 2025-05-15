@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <p style="font-family: Tektur, sans-serif;
+                  font-optical-sizing: auto;
+                  font-weight: 600;
+                  font-size: 40px;
+                  font-style: normal;">WEBRobotics API</p>
+    </div>
+    <div class="row">
+        Для нашего приложения написан API. Пишите свои приложения с использованием наших устройств и фунций!
+    </div>
+    <div class="row">
+        <div class="col"
+             style="background: linear-gradient(45deg, #fdfdfd, #e2effc); padding-left: 10px; margin-top: 10px; border-radius: 5px;">
+            • <a href="#api_documentation" style="color: #353535; text-decoration: none;"> Зачем нужен API? </a>
+            <br>
+            • <a href="#api_key_documentation" style="color: #353535; text-decoration: none;"> Ключ API </a>
+            <br>
+            • <a href="#request_structure_documentation" style="color: #353535; text-decoration: none;"> Структура
+            запроса </a>
+            <br>
+            • <a href="#questions_and_answers_api_documentation" style="color: #353535; text-decoration: none;"> Вопросы
+            и ответы </a>
+            <br>
+            • <a href="#saved_algorithms_api_documentation" style="color: #353535; text-decoration: none;"> Сохранённые
+            алгоритмы </a>
+            <br>
+            • <a href="#devices_api_documentation" style="color: #353535; text-decoration: none;"> Сохранённые
+            устройства </a>
+            <br>
+            • <a href="#getting_sensors_data_api_documentation" style="color: #353535; text-decoration: none;"> Данные с
+            датчиков машинки </a>
+            <br>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="container">
+            <div class="row">
+                <h4 id="api_documentation"> 1. Зачем нужен API? </h4>
+            </div>
+            <div class="row">
+                <a> <em> API (Application Programming Interface) </em>- это набор правил и протоколов, которым
+                    соглашаются следовать две отдельные системы или программы, позволяющие приложениям взаимодействовать
+                    друг с другом.
+                    По сути API — это посредник, который позволяет одной программе «общаться» с другой, обмениваться
+                    нужной информацией и отображать её для пользователей.
+                    Таким образом, WEBRobotics API поможет разработчикам использовать функции нашего приложения в своих
+                    проектах!
+                </a>
+                <br>
+                <em> Функции, которые поддерживает наш API: </em>
+                <br>
+                <div style="padding-left: 30px;">
+                    <a> <strong> ‣ Работа с системой вопросов и ответов. </strong> <br> Вы можете получить список ваших
+                        вопросов,
+                        данные о конкретном вопросе, изменить и задать вопрос с помощью HTTP-запросов, а также
+                        просматривайте ответы
+                        админов на ваши вопросы! </a>
+                    <br>
+                    <a> <strong> ‣ Работа с сохранёнными алгоритмами и устройствами. </strong> <br>Получайте подробную
+                        информацию
+                        о сохранённых вами устройствах и алгоритмах движения машинки! </a>
+                    <br>
+                    <a> <strong> ‣ Подключение машинки и управление. </strong> <br> С помощью HTTP-запросов управляйте
+                        нашей машикной!
+                        Вы можете подключиться к машинке, отправлять запросы для отдельного движения каждого мотора и
+                        двигаться по алгоритму!
+                    </a>
+                    <br>
+                    <a> <strong> ‣ Получение значений с датчиков. </strong> <br> На нашей машинке установленны датчики,
+                        и с помощью
+                        API вы можете получить значения с них!</a>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <a><i class="fa fa-exclamation-triangle" aria-hidden="true" style="color: #db0808;"></i>
+                    <strong>
+                        Вы не можете получать с помощью API такие данные, как логины и пароли, так как при передаче
+                        данные могут быть перехвачены!
+                    </strong>
+                </a>
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <h4 id="api_key_documentation"> 2. Ключ API </h4>
+            </div>
+            <div class="row">
+                <a>
+                    Для использования нашего API вам необходим уникальный ключ. Такой ключ выдается при регистрации
+                    в нашем приложении. Посмотреть и скопировать ключ вы можете в вашем личном кабинете в строке "Ключ
+                    API"
+                </a>
+            </div>
+            <div class="row">
+                <em> Пример API-ключа: </em>
+            </div>
+            <div class="row">
+                <div class="col-md-auto"
+                     style="background-color: #f3f3f3; padding-left: 10px; margin-top: 10px; border-radius: 5px;">
+                    <br>
+                    <a> 4le58yCO27UpuE0CuK08hU2P </a>
+                    <br>
+                    <br>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <a><i class="fa fa-exclamation-triangle" aria-hidden="true" style="color: #db0808;"></i>
+                    <strong>
+                        Никому не передавайте ваш ключ API, так как с его помощью можно получить доступ к вашим
+                        личным данным!
+                    </strong>
+                </a>
+            </div>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+        </div>
+        <div class="container">
+            <div class="row">
+                <h4 id="request_structure_documentation"> 3. Структура запроса </h4>
+            </div>
+            <div class="row">
+                <p> Для использования API используются HTTP-запросы (GET, POST, PUT, DELETE) - подробнее про них
+                    можно прочитать <a href="https://habr.com/ru/articles/865040/"
+                                       style="color: #717479; text-decoration: none;"> тут</a>.</p>
+            </div>
+            <div class="row">
+                <p> Здесь мы покажем, как использовать API с помощью <em>Python</em>,
+                    а точнее python-библиотеки <em>requests</em>. Однако вы можете использовать API и с помощью обычных
+                    HTTP-запросов.</p>
+            </div>
+            <div class="row">
+                <p> Итак, общая структура запроса: </p>
+                <br>
+                <div class="col-md-auto" style="background-color: #f3f3f3; padding-left: 10px; border-radius: 5px;">
+                    <br>
+                    <p> http://127.0.0.1:8080/api/<em>название ресурса</em>?api_key=<em>Ваш ключ API</em>&<em>Другие
+                        аргументы запроса</em></p>
+                    <br>
+                </div>
+                <p> Если же использовать Python: </p>
+                <br>
+                <div class="col-md-auto" style="background-color: #f3f3f3; padding-left: 10px; border-radius: 5px;">
+                    <code> Python </code>
+                    <p> import requests </p>
+                    <a> params = {'api_key': '<em>Ваш ключ API</em>', Другие аргументы запроса }</a>
+                    <br>
+                    <a> answer = requests.get("http://127.0.0.1:8080/api/<em>название ресурса</em>", json=params).json()</a>
+                    <br>
+                    <a> print(answer) </a>
+                    <br>
+                    <br>
+                </div>
+                <br>
+            </div>
+            <div class="row">
+                <p> Ресурсы - это единицы информации в API (например, вопросы, сохранённые устройства и т.д.) </p>
+                <p> Другие аргументы запроса (кроме ключа API, который нужен всегда) зависят от ресурса, к которому
+                    обращается пользователь. Прочитать про них можно далее. </p>
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+                <br>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <h4 id="questions_and_answers_api_documentation"> 4. Вопросы и ответы </h4>
+        </div>
+        <div class="row">
+            Начнём с API для получения и работы с вопросами пользователей и ответами разработчиков.
+        </div>
+        <div class="row">
+            <p> Аргументы запроса для вопросов пользователей: </p>
+            <br>
+        </div>
+        <div class="col-md-auto" style="background-color: #f3f3f3; padding-left: 10px; border-radius: 5px;">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">Аргумент</th>
+                    <th scope="col">Расшифровка</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td scope="row">api_key</td>
+                    <td>Ваш ключ API</td>
+                </tr>
+                <tr>
+                    <td scope="row">question_id</td>
+                    <td>ID запрашиваемого пользователем вопроса. Обязателен при GET-запросе (при получении одного элемента).</td>
+                </tr>
+                <tr>
+                    <td scope="row">theme</td>
+                    <td>Тема вопроса. Необходима при добавлении вопроса с помощью POST-запроса.</td>
+                </tr>
+                <tr>
+                    <td scope="row">question</td>
+                    <td>Сам вопрос, добавляемый с помощью API. Необходим при использовании POST-запроса.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% for i in range(10) %}
+<br>
+{% endfor %}
+{% endblock %}

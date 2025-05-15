@@ -19,4 +19,3 @@ def get_random_letter():
     letters_list = all_letters_list[random.randint(0, 1)]
     letter = letters_list[random.randint(0, len(letters_list) - 1)]
     return letter
-

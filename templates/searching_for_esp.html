@@ -18,15 +18,13 @@
             <h3> Найденные устройства: </h3>
             {% for device in available_esp %}
                 <div class="col-md6 border rounded" style="height: 50">
-                    • <a style="font-weight: 600; font-style: italic"> Имя: </a> {{ device.ssid }}
-                    <br>
-                    • <a style="font-weight: 600; font-style: italic"> id: </a> {{ device.id }}
+                    • <a style="font-weight: 600; font-style: italic"> Ssid: </a> {{ device.ssid }}
                     <br>
                     • <a style="font-weight: 600; font-style: italic"> Bssid: </a> {{ device.bssid }}
                     <br>
                     <br>
                     <a class="btn btn-secondary open-modal-btn" data-toggle="modal" data-target="#warning_modal" data-url="/connect_to_esp_ssid/{{device.ssid}}"> Подключиться </a>
-                    <a href="/save_device/{{device.ssid}}" class="btn btn-secondary"> Сохранить </a>
+                    <button class="btn btn-secondary" onclick="save_device('{{device.ssid}}', '{{device.bssid}}')"> Сохранить </button>
                     <br>
                     <br>
                 </div>
@@ -77,6 +75,11 @@
 
 </script>
 
+<script>
+    function save_device(ssid, bssid) {
+        window.location.href = "http://127.0.0.1:8080/save_device?ssid=" + ssid + "&bssid=" + bssid;
+    }
+</script>
 {% for i in range(22) %}
     <br>
 {% endfor %}

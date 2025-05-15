@@ -27,6 +27,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     saved_algorithms = orm.relationship("Saved_algorithm", back_populates='user')
     devices = orm.relationship("Devices", back_populates='user')
     questions = orm.relationship("Question", back_populates='user')
+    answers = orm.relationship("Answer", back_populates="user")
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
