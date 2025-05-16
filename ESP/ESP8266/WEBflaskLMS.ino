@@ -1,12 +1,20 @@
+/*
+Дисклеймер
+
+Этот код был написан недопрограммистом в 2 часа ночи с мухаморами и он работает на честном слове и святой воде.
+Пожалуйста, не меняйте ничего в коде(а лучше даже не читайте)
+Andrew-24coop, 2025
+*/
+
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
-#include <Servo.h>  // Include the Servo library
+#include <Servo.h>
 
-const char* ssid = "ESP8266_CAR_1";  // WiFi Name
-const char* password = "12345678";   // Password (min 8 chars)
+const char* ssid = "ESP8266_CAR_1";
+const char* password = "12345678";
 
 ESP8266WebServer server(80);
-const int ledPin = D4;  // LED pin
+const int ledPin = D4;
 bool ledState = false;
 
 Servo sFL;
@@ -18,14 +26,12 @@ const int sRL_pin = D6;
 Servo sRR;
 const int sRR_pin = D5;
 
-// Toggle LED state (inverted logic)
 void handleToggle() {
   ledState = !ledState;
-  digitalWrite(ledPin, ledState ? LOW : HIGH);  // Inverted
+  digitalWrite(ledPin, ledState ? LOW : HIGH);
   server.send(200, "text/plain", ledState ? "ON" : "OFF");
 }
 
-// Status endpoint
 void handleStatus() {
   server.send(200, "text/plain", "CONNECTED");
 }
@@ -98,22 +104,19 @@ void handleServoRR() {
 void setup() {
   Serial.begin(115200);
 
-  // Set ESP8266 as an Access Point
   WiFi.softAP(ssid, password);
   IPAddress IP = WiFi.softAPIP();
   Serial.print("ESP8266 AP IP Address: ");
   Serial.println(IP);
 
   pinMode(ledPin, OUTPUT);
-  digitalWrite(ledPin, HIGH);  // Default OFF (inverted)
+  digitalWrite(ledPin, HIGH);
 
-  // Attach the servo to the specified pin
   sFL.attach(sFL_pin);
   sFR.attach(sFR_pin);
   sRL.attach(sRL_pin);
   sRR.attach(sRR_pin);
 
-  // API routes
   server.on("/toggle", handleToggle);
   server.on("/status", handleStatus);
   server.on("/servo_fl", handleServoFL);
